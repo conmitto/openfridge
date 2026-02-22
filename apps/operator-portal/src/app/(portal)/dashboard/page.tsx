@@ -50,7 +50,7 @@ export default async function DashboardPage() {
 
     return (
         <div>
-            <div style={{ marginBottom: 32 }}>
+            <div className="page-header" style={{ marginBottom: 32 }}>
                 <h1 style={{ fontSize: 28, fontWeight: 700 }}>Dashboard</h1>
                 <p style={{ fontSize: 14, color: "var(--text-muted)", marginTop: 4 }}>
                     Overview of your vending operations
@@ -59,6 +59,7 @@ export default async function DashboardPage() {
 
             {/* Stat Cards */}
             <div
+                className="stat-grid"
                 style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(4, 1fr)",
@@ -102,67 +103,69 @@ export default async function DashboardPage() {
             </div>
 
             {/* Recent Transactions */}
-            <div className="glass-card" style={{ padding: 24 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>
-                    Recent Transactions
-                </h3>
-                <table className="data-table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Qty</th>
-                            <th>Amount</th>
-                            <th>Payment</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sales.slice(0, 10).map((sale) => (
-                            <tr key={sale.id}>
-                                <td style={{ color: "var(--text-primary)", fontWeight: 500 }}>
-                                    {sale.item_name}
-                                </td>
-                                <td>{sale.quantity}</td>
-                                <td style={{ color: "var(--accent-emerald)" }}>
-                                    {formatCurrency(Number(sale.total_price))}
-                                </td>
-                                <td>
-                                    <span
-                                        className="badge"
-                                        style={{
-                                            background:
-                                                sale.payment_method === "apple_pay"
-                                                    ? "rgba(59,130,246,0.15)"
-                                                    : sale.payment_method === "crypto"
-                                                        ? "rgba(245,158,11,0.15)"
-                                                        : "rgba(16,185,129,0.15)",
-                                            color:
-                                                sale.payment_method === "apple_pay"
-                                                    ? "var(--accent-blue)"
-                                                    : sale.payment_method === "crypto"
-                                                        ? "var(--accent-amber)"
-                                                        : "var(--accent-emerald)",
-                                        }}
-                                    >
-                                        {sale.payment_method === "apple_pay"
-                                            ? "Apple Pay"
-                                            : sale.payment_method === "crypto"
-                                                ? "Crypto"
-                                                : "Card"}
-                                    </span>
-                                </td>
-                                <td style={{ fontSize: 13 }}>{formatDateTime(sale.sold_at)}</td>
-                            </tr>
-                        ))}
-                        {sales.length === 0 && (
+            <div className="data-table-wrap">
+                <div className="glass-card" style={{ padding: 24 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>
+                        Recent Transactions
+                    </h3>
+                    <table className="data-table">
+                        <thead>
                             <tr>
-                                <td colSpan={5} style={{ textAlign: "center", padding: 40, color: "var(--text-muted)" }}>
-                                    No transactions yet. Connect your Supabase to see data.
-                                </td>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Amount</th>
+                                <th>Payment</th>
+                                <th>Date</th>
                             </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {sales.slice(0, 10).map((sale) => (
+                                <tr key={sale.id}>
+                                    <td style={{ color: "var(--text-primary)", fontWeight: 500 }}>
+                                        {sale.item_name}
+                                    </td>
+                                    <td>{sale.quantity}</td>
+                                    <td style={{ color: "var(--accent-emerald)" }}>
+                                        {formatCurrency(Number(sale.total_price))}
+                                    </td>
+                                    <td>
+                                        <span
+                                            className="badge"
+                                            style={{
+                                                background:
+                                                    sale.payment_method === "apple_pay"
+                                                        ? "rgba(59,130,246,0.15)"
+                                                        : sale.payment_method === "crypto"
+                                                            ? "rgba(245,158,11,0.15)"
+                                                            : "rgba(16,185,129,0.15)",
+                                                color:
+                                                    sale.payment_method === "apple_pay"
+                                                        ? "var(--accent-blue)"
+                                                        : sale.payment_method === "crypto"
+                                                            ? "var(--accent-amber)"
+                                                            : "var(--accent-emerald)",
+                                            }}
+                                        >
+                                            {sale.payment_method === "apple_pay"
+                                                ? "Apple Pay"
+                                                : sale.payment_method === "crypto"
+                                                    ? "Crypto"
+                                                    : "Card"}
+                                        </span>
+                                    </td>
+                                    <td style={{ fontSize: 13 }}>{formatDateTime(sale.sold_at)}</td>
+                                </tr>
+                            ))}
+                            {sales.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} style={{ textAlign: "center", padding: 40, color: "var(--text-muted)" }}>
+                                        No transactions yet. Connect your Supabase to see data.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

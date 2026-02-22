@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, MapPin, Trash2 } from "lucide-react";
+import { Plus, MapPin, Trash2, ExternalLink } from "lucide-react";
 import type { Machine } from "@/lib/supabase/types";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -55,7 +55,7 @@ export default function MachinesClient({ initialMachines }: MachinesClientProps)
 
     return (
         <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }} className="page-header">
                 <div>
                     <h1 style={{ fontSize: 28, fontWeight: 700 }}>Machines</h1>
                     <p style={{ fontSize: 14, color: "var(--text-muted)", marginTop: 4 }}>
@@ -68,7 +68,7 @@ export default function MachinesClient({ initialMachines }: MachinesClientProps)
             </div>
 
             {/* Machine Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 20 }}>
+            <div className="machine-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 20 }}>
                 {machines.map((machine) => (
                     <Link
                         key={machine.id}
@@ -97,17 +97,30 @@ export default function MachinesClient({ initialMachines }: MachinesClientProps)
                                     </span>{" "}
                                     items in stock
                                 </div>
-                                <button
-                                    className="btn-danger"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        handleDelete(machine.id);
-                                    }}
-                                    style={{ padding: "6px 10px" }}
-                                >
-                                    <Trash2 size={14} />
-                                </button>
+                                <div style={{ display: "flex", gap: 6 }}>
+                                    <a
+                                        href={`/kiosk/${machine.id}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="btn-secondary"
+                                        style={{ padding: "6px 10px", fontSize: 12 }}
+                                    >
+                                        <ExternalLink size={14} />
+                                        Kiosk
+                                    </a>
+                                    <button
+                                        className="btn-danger"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleDelete(machine.id);
+                                        }}
+                                        style={{ padding: "6px 10px" }}
+                                    >
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </Link>
