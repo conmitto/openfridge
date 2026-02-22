@@ -12,6 +12,10 @@ CREATE TABLE IF NOT EXISTS machines (
   name TEXT NOT NULL,
   location TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'maintenance')),
+  lock_enabled BOOLEAN NOT NULL DEFAULT false,
+  lock_api_url TEXT,
+  lock_api_key TEXT,
+  lock_duration_sec INTEGER NOT NULL DEFAULT 30,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

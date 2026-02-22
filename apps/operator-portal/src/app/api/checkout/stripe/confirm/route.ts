@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { unlockMachine } from "@/lib/smartlock";
 
 export async function POST(req: NextRequest) {
     try {
@@ -43,10 +44,18 @@ export async function POST(req: NextRequest) {
             }
         }
 
+        // Attempt smart lock unlock (non-blocking if not configured)
+        const lockResult = await unlockMachine(machineId);
+
         return NextResponse.json({
             success: true,
             orderId: paymentIntentId,
             contact,
+            lock: {
+                unlocked: lockResult.unlocked,
+                expiresAt: lockResult.expiresAt,
+                error: lockResult.error,
+            },
         });
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Confirm failed";

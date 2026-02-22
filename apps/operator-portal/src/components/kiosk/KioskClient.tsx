@@ -5,7 +5,7 @@ import type { Machine, Inventory } from "@/lib/supabase/types";
 import {
     ShoppingCart, Plus, Minus, Trash2, CreditCard,
     Bitcoin, Check, ArrowLeft, Mail, User,
-    Loader2, Phone, Receipt,
+    Loader2, Phone, Receipt, Lock, Unlock, AlertCircle,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import StripeProvider from "./StripeProvider";
@@ -38,6 +38,12 @@ export default function KioskClient({
     const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
     const [contact, setContact] = useState({ name: "", email: "", phone: "" });
     const [confirming, setConfirming] = useState(false);
+    const [confirmError, setConfirmError] = useState<string | null>(null);
+    const [lockStatus, setLockStatus] = useState<{
+        unlocked: boolean;
+        expiresAt: string | null;
+    } | null>(null);
+    const [receiptCountdown, setReceiptCountdown] = useState(15);
     const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Simulate load delay for hydration
@@ -154,8 +160,9 @@ export default function KioskClient({
 
     const handleContactSubmit = async () => {
         setConfirming(true);
+        setConfirmError(null);
         try {
-            await fetch("/api/checkout/stripe/confirm", {
+            const res = await fetch("/api/checkout/stripe/confirm", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -170,10 +177,27 @@ export default function KioskClient({
                     })),
                 }),
             });
+            const data = await res.json();
+            if (!res.ok) {
+                setConfirmError(data.error || "Order confirmation failed");
+                setConfirming(false);
+                return;
+            }
+            // Capture lock status
+            if (data.lock) {
+                setLockStatus({
+                    unlocked: data.lock.unlocked,
+                    expiresAt: data.lock.expiresAt,
+                });
+            }
         } catch (err) {
             console.error("Confirm error:", err);
+            setConfirmError("Network error — please try again");
+            setConfirming(false);
+            return;
         }
         setConfirming(false);
+        setReceiptCountdown(15);
         setStep("receipt");
     };
 
@@ -183,7 +207,26 @@ export default function KioskClient({
         setClientSecret(null);
         setPaymentIntentId(null);
         setContact({ name: "", email: "", phone: "" });
+        setConfirmError(null);
+        setLockStatus(null);
+        setReceiptCountdown(15);
     }, []);
+
+    // Auto-return to idle from receipt
+    useEffect(() => {
+        if (step !== "receipt") return;
+        const interval = setInterval(() => {
+            setReceiptCountdown((prev) => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    resetOrder();
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [step, resetOrder]);
 
     const handleActivate = useCallback(() => {
         setStep("browse");
@@ -223,6 +266,27 @@ export default function KioskClient({
                 }}>
                     Order Complete!
                 </h1>
+
+                {/* Lock status */}
+                {lockStatus?.unlocked && (
+                    <div style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        background: "rgba(16,185,129,0.1)",
+                        border: "1px solid rgba(16,185,129,0.3)",
+                        borderRadius: 12, padding: "12px 20px",
+                        animation: "fadeIn 0.5s ease 0.3s both",
+                    }}>
+                        <Unlock size={20} color="#10b981" />
+                        <div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: "#10b981" }}>
+                                Fridge Unlocked
+                            </div>
+                            <div style={{ fontSize: 12, color: "#6ee7b7" }}>
+                                Open the door within 30 seconds
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Receipt card */}
                 <div style={{
@@ -264,18 +328,24 @@ export default function KioskClient({
                     Thank you for your purchase. Enjoy!
                 </p>
 
-                <button
-                    onClick={resetOrder}
-                    style={{
-                        marginTop: 8, padding: "10px 28px", borderRadius: 12,
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        background: "rgba(255,255,255,0.05)",
-                        color: "#94a3b8", fontSize: 14, fontWeight: 600,
-                        cursor: "pointer",
-                    }}
-                >
-                    New Order
-                </button>
+                {/* Countdown + New Order */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                    <button
+                        onClick={resetOrder}
+                        style={{
+                            padding: "10px 28px", borderRadius: 12,
+                            border: "1px solid rgba(255,255,255,0.1)",
+                            background: "rgba(255,255,255,0.05)",
+                            color: "#94a3b8", fontSize: 14, fontWeight: 600,
+                            cursor: "pointer",
+                        }}
+                    >
+                        New Order
+                    </button>
+                    <span style={{ fontSize: 11, color: "#475569" }}>
+                        Returning home in {receiptCountdown}s
+                    </span>
+                </div>
 
                 <style>{`
                     @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }

@@ -9,6 +9,10 @@ export interface Database {
                     name: string;
                     location: string;
                     status: "active" | "inactive" | "maintenance";
+                    lock_enabled: boolean;
+                    lock_api_url: string | null;
+                    lock_api_key: string | null;
+                    lock_duration_sec: number;
                     created_at: string;
                 };
                 Insert: {
@@ -16,6 +20,10 @@ export interface Database {
                     name: string;
                     location: string;
                     status?: "active" | "inactive" | "maintenance";
+                    lock_enabled?: boolean;
+                    lock_api_url?: string | null;
+                    lock_api_key?: string | null;
+                    lock_duration_sec?: number;
                     created_at?: string;
                 };
                 Update: {
@@ -23,6 +31,10 @@ export interface Database {
                     name?: string;
                     location?: string;
                     status?: "active" | "inactive" | "maintenance";
+                    lock_enabled?: boolean;
+                    lock_api_url?: string | null;
+                    lock_api_key?: string | null;
+                    lock_duration_sec?: number;
                     created_at?: string;
                 };
                 Relationships: [];
