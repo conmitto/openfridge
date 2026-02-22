@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { Machine, Inventory } from "@/lib/supabase/types";
 import {
     ShoppingCart, Plus, Minus, Trash2, CreditCard,
@@ -11,8 +11,9 @@ import dynamic from "next/dynamic";
 import StripeProvider from "./StripeProvider";
 import PaymentForm from "./PaymentForm";
 
-// Lazy-load webcam to avoid SSR issues
+// Lazy-load webcam and idle screen to avoid SSR issues
 const WebcamFeed = dynamic(() => import("./WebcamFeed"), { ssr: false });
+const IdleScreen = dynamic(() => import("./IdleScreen"), { ssr: false });
 
 // ─── Types ─────────────────────────────────────────────
 interface CartItem {
@@ -20,7 +21,7 @@ interface CartItem {
     quantity: number;
 }
 
-type CheckoutStep = "browse" | "payment" | "contact" | "receipt";
+type CheckoutStep = "idle" | "browse" | "payment" | "contact" | "receipt";
 
 // ─── Component ─────────────────────────────────────────
 export default function KioskClient({
@@ -31,18 +32,31 @@ export default function KioskClient({
     inventory: Inventory[];
 }) {
     const [cart, setCart] = useState<CartItem[]>([]);
-    const [step, setStep] = useState<CheckoutStep>("browse");
+    const [step, setStep] = useState<CheckoutStep>("idle");
     const [loaded, setLoaded] = useState(false);
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
     const [contact, setContact] = useState({ name: "", email: "", phone: "" });
     const [confirming, setConfirming] = useState(false);
+    const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Simulate load delay for hydration
     useEffect(() => {
         const t = setTimeout(() => setLoaded(true), 300);
         return () => clearTimeout(t);
     }, []);
+
+    // Inactivity timer — return to idle after 90s of browse with empty cart
+    useEffect(() => {
+        if (step === "browse" && cart.length === 0) {
+            inactivityTimerRef.current = setTimeout(() => {
+                setStep("idle");
+            }, 90000);
+        }
+        return () => {
+            if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+        };
+    }, [step, cart.length]);
 
     // ─── Cart Logic ────────────────────────────────────
     const addToCart = useCallback((item: Inventory) => {
@@ -163,13 +177,22 @@ export default function KioskClient({
         setStep("receipt");
     };
 
-    const resetOrder = () => {
+    const resetOrder = useCallback(() => {
         setCart([]);
-        setStep("browse");
+        setStep("idle");
         setClientSecret(null);
         setPaymentIntentId(null);
         setContact({ name: "", email: "", phone: "" });
-    };
+    }, []);
+
+    const handleActivate = useCallback(() => {
+        setStep("browse");
+    }, []);
+
+    // ─── Idle Screen ───────────────────────────────────
+    if (step === "idle") {
+        return <IdleScreen machine={machine} onActivate={handleActivate} />;
+    }
 
     // ─── Receipt Screen ────────────────────────────────
     if (step === "receipt") {
