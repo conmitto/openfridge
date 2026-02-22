@@ -37,6 +37,10 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-sans, "Inter", system-ui, sans-serif);
+}
+
+/* Portal pages use internal scroll; prevent body scroll only there */
+body:has(.portal-main) {
   overflow: hidden;
 }
 
