@@ -9,6 +9,9 @@ export interface Database {
                     name: string;
                     location: string;
                     status: "active" | "inactive" | "maintenance";
+                    owner_id: string | null;
+                    image_url: string | null;
+                    description: string | null;
                     lock_enabled: boolean;
                     lock_api_url: string | null;
                     lock_api_key: string | null;
@@ -20,6 +23,9 @@ export interface Database {
                     name: string;
                     location: string;
                     status?: "active" | "inactive" | "maintenance";
+                    owner_id?: string | null;
+                    image_url?: string | null;
+                    description?: string | null;
                     lock_enabled?: boolean;
                     lock_api_url?: string | null;
                     lock_api_key?: string | null;
@@ -31,6 +37,9 @@ export interface Database {
                     name?: string;
                     location?: string;
                     status?: "active" | "inactive" | "maintenance";
+                    owner_id?: string | null;
+                    image_url?: string | null;
+                    description?: string | null;
                     lock_enabled?: boolean;
                     lock_api_url?: string | null;
                     lock_api_key?: string | null;
@@ -125,6 +134,33 @@ export interface Database {
                     }
                 ];
             };
+            profiles: {
+                Row: {
+                    id: string;
+                    full_name: string | null;
+                    company_name: string | null;
+                    avatar_url: string | null;
+                    onboarded: boolean;
+                    created_at: string;
+                };
+                Insert: {
+                    id: string;
+                    full_name?: string | null;
+                    company_name?: string | null;
+                    avatar_url?: string | null;
+                    onboarded?: boolean;
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    full_name?: string | null;
+                    company_name?: string | null;
+                    avatar_url?: string | null;
+                    onboarded?: boolean;
+                    created_at?: string;
+                };
+                Relationships: [];
+            };
         };
         Views: Record<string, never>;
         Functions: Record<string, never>;
@@ -139,3 +175,5 @@ export type Inventory = Database["public"]["Tables"]["inventory"]["Row"];
 export type InventoryInsert = Database["public"]["Tables"]["inventory"]["Insert"];
 export type Sale = Database["public"]["Tables"]["sales"]["Row"];
 export type SaleInsert = Database["public"]["Tables"]["sales"]["Insert"];
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"];

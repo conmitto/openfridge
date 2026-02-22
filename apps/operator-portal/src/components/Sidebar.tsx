@@ -11,13 +11,17 @@ import {
     Snowflake,
     Menu,
     X,
+    Bot,
+    LogOut,
 } from "lucide-react";
+import { createBrowserClient } from "@supabase/ssr";
 
 const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/machines", label: "Machines", icon: Server },
     { href: "/inventory", label: "Inventory", icon: Package },
     { href: "/restock", label: "Restock", icon: AlertTriangle },
+    { href: "/agent", label: "Agent", icon: Bot },
 ];
 
 export default function Sidebar() {
@@ -232,27 +236,28 @@ function SidebarContent({ pathname }: { pathname: string }) {
 
             {/* Footer */}
             <div style={{ marginTop: "auto", paddingTop: 20 }}>
-                <div
-                    className="glass-card"
+                <button
+                    onClick={async () => {
+                        const supabase = createBrowserClient(
+                            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+                        );
+                        await supabase.auth.signOut();
+                        window.location.href = "/login";
+                    }}
+                    className="sidebar-link"
                     style={{
-                        padding: 16,
-                        background: "var(--gradient-card)",
+                        textDecoration: "none",
+                        width: "100%",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        color: "var(--text-muted)",
                     }}
                 >
-                    <div
-                        style={{
-                            fontSize: 12,
-                            fontWeight: 600,
-                            color: "var(--text-primary)",
-                            marginBottom: 4,
-                        }}
-                    >
-                        Need Help?
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.5 }}>
-                        Run schema.sql in your Supabase SQL Editor to initialize the database.
-                    </div>
-                </div>
+                    <LogOut size={18} />
+                    Sign Out
+                </button>
             </div>
         </>
     );
