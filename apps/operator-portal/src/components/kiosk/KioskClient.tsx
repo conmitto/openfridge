@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import type { Machine, Inventory } from "@/lib/supabase/types";
 import {
     ShoppingCart, Plus, Minus, Trash2, CreditCard,
-    Bitcoin, X, Check, ArrowLeft, Mail, User,
+    Bitcoin, Check, ArrowLeft, Mail, User,
     Loader2, Phone, Receipt,
 } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -384,34 +384,42 @@ export default function KioskClient({
                             );
                         })}
                     </div>
+                </div>
 
-                    {/* Webcam Section */}
-                    <div style={{
-                        marginTop: 20,
-                        height: 220,
-                        borderRadius: 16,
-                        overflow: "hidden",
-                        border: "1px solid rgba(255,255,255,0.06)",
-                    }}>
-                        <WebcamFeed />
-                    </div>
+                {/* Webcam — fixed square in bottom-left corner */}
+                <div style={{
+                    position: "fixed",
+                    bottom: 20,
+                    left: 20,
+                    width: 200,
+                    height: 200,
+                    borderRadius: 14,
+                    overflow: "hidden",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                    zIndex: 10,
+                }}>
+                    <WebcamFeed />
                 </div>
             </div>
 
             {/* ─── Right: Cart / Payment / Contact Panel ─── */}
+            {/* Hidden when cart is empty and browsing */}
             <div style={{
-                width: 360,
-                borderLeft: "1px solid rgba(255,255,255,0.06)",
+                width: (step === "browse" && cart.length === 0) ? 0 : 360,
+                minWidth: (step === "browse" && cart.length === 0) ? 0 : 360,
+                borderLeft: (step === "browse" && cart.length === 0) ? "none" : "1px solid rgba(255,255,255,0.06)",
                 display: "flex", flexDirection: "column",
                 background: "rgba(0,0,0,0.2)",
-                opacity: loaded ? 1 : 0,
-                transform: loaded ? "translateX(0)" : "translateX(20px)",
-                transition: "all 0.5s ease 0.2s",
+                overflow: "hidden",
+                opacity: (step === "browse" && cart.length === 0) ? 0 : 1,
+                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
             }}>
                 {/* Panel Header */}
                 <div style={{
                     padding: "20px 22px 14px",
                     borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    whiteSpace: "nowrap",
                 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         {step !== "browse" && (
@@ -450,88 +458,74 @@ export default function KioskClient({
                 {/* Panel Content */}
                 <div style={{ flex: 1, overflow: "auto", padding: "10px 22px" }}>
                     {/* ── Browse: Cart Items ── */}
-                    {step === "browse" && (
-                        <>
-                            {cart.length === 0 ? (
-                                <div style={{
-                                    display: "flex", flexDirection: "column",
-                                    alignItems: "center", justifyContent: "center",
-                                    height: "100%", color: "#475569", gap: 10,
+                    {step === "browse" && cart.length > 0 && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                            {cart.map((c) => (
+                                <div key={c.inventory.id} style={{
+                                    display: "flex", alignItems: "center", gap: 10,
+                                    padding: "10px 12px",
+                                    background: "rgba(255,255,255,0.03)",
+                                    borderRadius: 10,
+                                    border: "1px solid rgba(255,255,255,0.05)",
                                 }}>
-                                    <ShoppingCart size={36} strokeWidth={1.5} />
-                                    <p style={{ fontSize: 13, fontWeight: 500 }}>Cart is empty</p>
-                                    <p style={{ fontSize: 11, color: "#334155" }}>Tap items to add them</p>
-                                </div>
-                            ) : (
-                                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                                    {cart.map((c) => (
-                                        <div key={c.inventory.id} style={{
-                                            display: "flex", alignItems: "center", gap: 10,
-                                            padding: "10px 12px",
-                                            background: "rgba(255,255,255,0.03)",
-                                            borderRadius: 10,
-                                            border: "1px solid rgba(255,255,255,0.05)",
+                                    <div style={{
+                                        width: 34, height: 34, borderRadius: 8,
+                                        background: "rgba(59,130,246,0.1)",
+                                        display: "flex", alignItems: "center",
+                                        justifyContent: "center", fontSize: 18, flexShrink: 0,
+                                    }}>
+                                        {getItemEmoji(c.inventory.item_name)}
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{
+                                            fontSize: 12, fontWeight: 600, color: "#e2e8f0",
+                                            whiteSpace: "nowrap", overflow: "hidden",
+                                            textOverflow: "ellipsis",
                                         }}>
-                                            <div style={{
-                                                width: 34, height: 34, borderRadius: 8,
-                                                background: "rgba(59,130,246,0.1)",
-                                                display: "flex", alignItems: "center",
-                                                justifyContent: "center", fontSize: 18, flexShrink: 0,
-                                            }}>
-                                                {getItemEmoji(c.inventory.item_name)}
-                                            </div>
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{
-                                                    fontSize: 12, fontWeight: 600, color: "#e2e8f0",
-                                                    whiteSpace: "nowrap", overflow: "hidden",
-                                                    textOverflow: "ellipsis",
-                                                }}>
-                                                    {c.inventory.item_name}
-                                                </div>
-                                                <div style={{ fontSize: 11, color: "#64748b" }}>
-                                                    ${Number(c.inventory.price).toFixed(2)} ea
-                                                </div>
-                                            </div>
-                                            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                                                <button onClick={() => updateQuantity(c.inventory.id, -1)} style={qtyBtnStyle}>
-                                                    <Minus size={12} />
-                                                </button>
-                                                <span style={{
-                                                    width: 20, textAlign: "center",
-                                                    fontSize: 13, fontWeight: 700, color: "#f1f5f9",
-                                                }}>
-                                                    {c.quantity}
-                                                </span>
-                                                <button
-                                                    onClick={() => updateQuantity(c.inventory.id, 1)}
-                                                    disabled={c.quantity >= c.inventory.stock_count}
-                                                    style={{
-                                                        ...qtyBtnStyle,
-                                                        background: "rgba(59,130,246,0.15)",
-                                                        color: "#3b82f6",
-                                                        opacity: c.quantity >= c.inventory.stock_count ? 0.4 : 1,
-                                                    }}
-                                                >
-                                                    <Plus size={12} />
-                                                </button>
-                                            </div>
-                                            <button onClick={() => removeFromCart(c.inventory.id)} style={{
-                                                background: "none", border: "none",
-                                                color: "#475569", cursor: "pointer", padding: 3,
-                                            }}>
-                                                <Trash2 size={13} />
-                                            </button>
-                                            <div style={{
-                                                fontSize: 13, fontWeight: 700, color: "#f1f5f9",
-                                                minWidth: 45, textAlign: "right",
-                                            }}>
-                                                ${(Number(c.inventory.price) * c.quantity).toFixed(2)}
-                                            </div>
+                                            {c.inventory.item_name}
                                         </div>
-                                    ))}
+                                        <div style={{ fontSize: 11, color: "#64748b" }}>
+                                            ${Number(c.inventory.price).toFixed(2)} ea
+                                        </div>
+                                    </div>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                                        <button onClick={() => updateQuantity(c.inventory.id, -1)} style={qtyBtnStyle}>
+                                            <Minus size={12} />
+                                        </button>
+                                        <span style={{
+                                            width: 20, textAlign: "center",
+                                            fontSize: 13, fontWeight: 700, color: "#f1f5f9",
+                                        }}>
+                                            {c.quantity}
+                                        </span>
+                                        <button
+                                            onClick={() => updateQuantity(c.inventory.id, 1)}
+                                            disabled={c.quantity >= c.inventory.stock_count}
+                                            style={{
+                                                ...qtyBtnStyle,
+                                                background: "rgba(59,130,246,0.15)",
+                                                color: "#3b82f6",
+                                                opacity: c.quantity >= c.inventory.stock_count ? 0.4 : 1,
+                                            }}
+                                        >
+                                            <Plus size={12} />
+                                        </button>
+                                    </div>
+                                    <button onClick={() => removeFromCart(c.inventory.id)} style={{
+                                        background: "none", border: "none",
+                                        color: "#475569", cursor: "pointer", padding: 3,
+                                    }}>
+                                        <Trash2 size={13} />
+                                    </button>
+                                    <div style={{
+                                        fontSize: 13, fontWeight: 700, color: "#f1f5f9",
+                                        minWidth: 45, textAlign: "right",
+                                    }}>
+                                        ${(Number(c.inventory.price) * c.quantity).toFixed(2)}
+                                    </div>
                                 </div>
-                            )}
-                        </>
+                            ))}
+                        </div>
                     )}
 
                     {/* ── Payment Step ── */}
@@ -721,7 +715,7 @@ export default function KioskClient({
                 ::-webkit-scrollbar-track { background: transparent; }
                 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 3px; }
             `}</style>
-        </div>
+        </div >
     );
 }
 
