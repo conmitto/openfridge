@@ -360,7 +360,8 @@ export default function KioskClient({
         <div style={{
             height: "100vh", display: "flex", overflow: "hidden",
             opacity: loaded ? 1 : 0,
-            transition: "opacity 0.4s ease",
+            transition: "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+            background: "linear-gradient(160deg, #070b14 0%, #0c1425 50%, #0a101f 100%)",
         }}>
             {/* ─── Left: Product Grid + Webcam ─── */}
             <div style={{
@@ -368,107 +369,160 @@ export default function KioskClient({
             }}>
                 {/* Header */}
                 <div style={{
-                    padding: "20px 28px",
-                    borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    padding: "24px 32px 20px",
                     display: "flex", justifyContent: "space-between", alignItems: "center",
+                    background: "rgba(0,0,0,0.2)",
+                    backdropFilter: "blur(20px)",
+                    borderBottom: "1px solid rgba(255,255,255,0.04)",
                 }}>
-                    <div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 2 }}>
-                            <div style={{
-                                width: 36, height: 36, borderRadius: 10,
-                                background: "linear-gradient(135deg, #3b82f6, #06b6d4)",
-                                display: "flex", alignItems: "center", justifyContent: "center",
-                                fontSize: 16,
-                            }}>❄️</div>
-                            <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.02em" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                        <div style={{
+                            width: 44, height: 44, borderRadius: 14,
+                            background: "linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 20, boxShadow: "0 4px 20px rgba(59,130,246,0.3)",
+                        }}>❄️</div>
+                        <div>
+                            <h1 style={{
+                                fontSize: 24, fontWeight: 800,
+                                letterSpacing: "-0.03em",
+                                background: "linear-gradient(135deg, #f1f5f9, #cbd5e1)",
+                                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                            }}>
                                 {machine.name}
                             </h1>
+                            <p style={{ fontSize: 13, color: "#4b5563", marginTop: 1, letterSpacing: "0.02em" }}>
+                                {machine.location}
+                            </p>
                         </div>
-                        <p style={{ fontSize: 12, color: "#64748b", paddingLeft: 46 }}>
-                            {machine.location}
-                        </p>
                     </div>
                     <div style={{
-                        padding: "6px 14px", borderRadius: 16,
-                        background: "rgba(16,185,129,0.12)",
-                        color: "#10b981", fontSize: 12, fontWeight: 600,
+                        display: "flex", alignItems: "center", gap: 6,
+                        padding: "8px 18px", borderRadius: 28,
+                        background: "rgba(16,185,129,0.08)",
+                        border: "1px solid rgba(16,185,129,0.15)",
                     }}>
-                        {inventory.length} items
+                        <div style={{
+                            width: 7, height: 7, borderRadius: "50%",
+                            background: "#10b981",
+                            boxShadow: "0 0 8px rgba(16,185,129,0.6)",
+                            animation: "pulse-dot 2s ease-in-out infinite",
+                        }} />
+                        <span style={{ fontSize: 13, fontWeight: 600, color: "#10b981" }}>
+                            {inventory.length} items available
+                        </span>
                     </div>
                 </div>
 
-                {/* Content area: Grid + Webcam */}
-                <div style={{ flex: 1, overflow: "auto", padding: "20px 28px" }}>
-                    {/* Product Grid */}
+                {/* Content area: Grid */}
+                <div style={{
+                    flex: 1, overflow: "auto", padding: "24px 32px 120px",
+                }}>
+                    {/* Greeting */}
+                    <p style={{
+                        fontSize: 15, color: "#475569", marginBottom: 20,
+                        fontWeight: 500,
+                    }}>
+                        Tap an item to add it to your cart
+                    </p>
+
+                    {/* Product Grid — optimized for iPad landscape */}
                     <div style={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-                        gap: 14,
+                        gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+                        gap: 18,
                     }}>
-                        {inventory.map((item) => {
+                        {inventory.map((item, index) => {
                             const inCart = cart.find((c) => c.inventory.id === item.id);
                             const isMaxed = inCart && inCart.quantity >= item.stock_count;
+                            const isOutOfStock = item.stock_count === 0;
 
                             return (
                                 <button
                                     key={item.id}
                                     onClick={() => addToCart(item)}
-                                    disabled={!!isMaxed || step !== "browse"}
+                                    disabled={!!isMaxed || isOutOfStock || step !== "browse"}
                                     style={{
                                         background: inCart
-                                            ? "linear-gradient(135deg, rgba(59,130,246,0.15), rgba(6,182,212,0.1))"
-                                            : "rgba(255,255,255,0.03)",
+                                            ? "linear-gradient(145deg, rgba(59,130,246,0.12), rgba(139,92,246,0.08))"
+                                            : "rgba(255,255,255,0.02)",
                                         border: inCart
-                                            ? "1px solid rgba(59,130,246,0.3)"
-                                            : "1px solid rgba(255,255,255,0.06)",
-                                        borderRadius: 14, padding: 16,
-                                        cursor: isMaxed || step !== "browse" ? "not-allowed" : "pointer",
-                                        textAlign: "left", transition: "all 0.2s ease",
+                                            ? "1px solid rgba(59,130,246,0.25)"
+                                            : "1px solid rgba(255,255,255,0.05)",
+                                        borderRadius: 20, padding: "22px 20px",
+                                        cursor: isMaxed || isOutOfStock || step !== "browse" ? "not-allowed" : "pointer",
+                                        textAlign: "left",
+                                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                                         position: "relative",
-                                        opacity: isMaxed ? 0.5 : 1,
+                                        opacity: isMaxed || isOutOfStock ? 0.4 : 1,
                                         color: "inherit",
+                                        backdropFilter: "blur(12px)",
+                                        animation: `cardFadeIn 0.5s ease ${index * 0.06}s both`,
+                                        overflow: "hidden",
                                     }}
                                 >
+                                    {/* Shimmer overlay */}
                                     <div style={{
-                                        width: 48, height: 48, borderRadius: 12,
-                                        background: "linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15))",
+                                        position: "absolute", inset: 0, borderRadius: 20,
+                                        background: "linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.02) 50%, transparent 60%)",
+                                        pointerEvents: "none",
+                                    }} />
+
+                                    <div style={{
+                                        width: 56, height: 56, borderRadius: 16,
+                                        background: inCart
+                                            ? "linear-gradient(135deg, rgba(59,130,246,0.2), rgba(139,92,246,0.15))"
+                                            : "linear-gradient(135deg, rgba(59,130,246,0.08), rgba(139,92,246,0.05))",
                                         display: "flex", alignItems: "center", justifyContent: "center",
-                                        fontSize: 24, marginBottom: 10,
+                                        fontSize: 28, marginBottom: 14,
+                                        transition: "transform 0.3s ease, background 0.3s ease",
+                                        transform: inCart ? "scale(1.05)" : "scale(1)",
                                     }}>
                                         {getItemEmoji(item.item_name)}
                                     </div>
+
                                     <h3 style={{
-                                        fontSize: 14, fontWeight: 600, color: "#f1f5f9",
-                                        marginBottom: 4, lineHeight: 1.3,
+                                        fontSize: 16, fontWeight: 700, color: "#f1f5f9",
+                                        marginBottom: 6, lineHeight: 1.3,
+                                        letterSpacing: "-0.01em",
                                     }}>
                                         {item.item_name}
                                     </h3>
+
                                     <div style={{
-                                        display: "flex", justifyContent: "space-between", alignItems: "center",
+                                        display: "flex", justifyContent: "space-between", alignItems: "flex-end",
                                     }}>
                                         <span style={{
-                                            fontSize: 18, fontWeight: 800,
+                                            fontSize: 22, fontWeight: 800,
                                             background: "linear-gradient(135deg, #10b981, #06b6d4)",
                                             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
                                         }}>
                                             ${Number(item.price).toFixed(2)}
                                         </span>
                                         <span style={{
-                                            fontSize: 10,
-                                            color: item.stock_count <= 3 ? "#f59e0b" : "#64748b",
-                                            fontWeight: 500,
+                                            fontSize: 11, fontWeight: 600,
+                                            color: isOutOfStock
+                                                ? "#ef4444"
+                                                : item.stock_count <= 3 ? "#f59e0b" : "#3f4f66",
+                                            padding: "3px 8px", borderRadius: 8,
+                                            background: isOutOfStock
+                                                ? "rgba(239,68,68,0.1)"
+                                                : item.stock_count <= 3 ? "rgba(245,158,11,0.1)" : "rgba(255,255,255,0.03)",
                                         }}>
-                                            {item.stock_count} left
+                                            {isOutOfStock ? "Sold out" : `${item.stock_count} left`}
                                         </span>
                                     </div>
+
+                                    {/* Cart quantity badge */}
                                     {inCart && (
                                         <div style={{
-                                            position: "absolute", top: 8, right: 8,
-                                            width: 24, height: 24, borderRadius: "50%",
-                                            background: "linear-gradient(135deg, #3b82f6, #06b6d4)",
+                                            position: "absolute", top: 12, right: 12,
+                                            width: 30, height: 30, borderRadius: "50%",
+                                            background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
                                             display: "flex", alignItems: "center", justifyContent: "center",
-                                            fontSize: 11, fontWeight: 800, color: "white",
-                                            boxShadow: "0 2px 10px rgba(59,130,246,0.4)",
+                                            fontSize: 13, fontWeight: 800, color: "white",
+                                            boxShadow: "0 4px 15px rgba(59,130,246,0.5)",
+                                            animation: "badgePop 0.3s ease",
                                         }}>
                                             {inCart.quantity}
                                         </div>
@@ -479,39 +533,40 @@ export default function KioskClient({
                     </div>
                 </div>
 
-                {/* Webcam — fixed square in bottom-left corner */}
+                {/* Webcam — frosted glass in bottom-left corner */}
                 <div style={{
                     position: "fixed",
-                    bottom: 20,
-                    left: 20,
-                    width: 200,
-                    height: 200,
-                    borderRadius: 14,
+                    bottom: 24,
+                    left: 24,
+                    width: 180,
+                    height: 180,
+                    borderRadius: 20,
                     overflow: "hidden",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    boxShadow: "0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)",
                     zIndex: 10,
+                    backdropFilter: "blur(8px)",
                 }}>
                     <WebcamFeed />
                 </div>
             </div>
 
             {/* ─── Right: Cart / Payment / Contact Panel ─── */}
-            {/* Hidden when cart is empty and browsing */}
             <div style={{
-                width: (step === "browse" && cart.length === 0) ? 0 : 360,
-                minWidth: (step === "browse" && cart.length === 0) ? 0 : 360,
-                borderLeft: (step === "browse" && cart.length === 0) ? "none" : "1px solid rgba(255,255,255,0.06)",
+                width: (step === "browse" && cart.length === 0) ? 0 : 380,
+                minWidth: (step === "browse" && cart.length === 0) ? 0 : 380,
+                borderLeft: (step === "browse" && cart.length === 0) ? "none" : "1px solid rgba(255,255,255,0.04)",
                 display: "flex", flexDirection: "column",
-                background: "rgba(0,0,0,0.2)",
+                background: "rgba(0,0,0,0.3)",
+                backdropFilter: "blur(40px)",
                 overflow: "hidden",
                 opacity: (step === "browse" && cart.length === 0) ? 0 : 1,
-                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
             }}>
                 {/* Panel Header */}
                 <div style={{
-                    padding: "20px 22px 14px",
-                    borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    padding: "24px 24px 18px",
+                    borderBottom: "1px solid rgba(255,255,255,0.04)",
                     whiteSpace: "nowrap",
                 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -522,15 +577,24 @@ export default function KioskClient({
                                     else if (step === "contact") setStep("browse");
                                 }}
                                 style={{
-                                    background: "none", border: "none",
-                                    color: "#64748b", cursor: "pointer", padding: 2,
+                                    background: "rgba(255,255,255,0.05)", border: "none",
+                                    borderRadius: 10, width: 36, height: 36,
+                                    color: "#94a3b8", cursor: "pointer",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    transition: "all 0.2s ease",
                                 }}
                             >
                                 <ArrowLeft size={18} />
                             </button>
                         )}
-                        <ShoppingCart size={18} color="#3b82f6" />
-                        <h2 style={{ fontSize: 16, fontWeight: 700 }}>
+                        <div style={{
+                            width: 36, height: 36, borderRadius: 10,
+                            background: "linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.1))",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                            <ShoppingCart size={17} color="#3b82f6" />
+                        </div>
+                        <h2 style={{ fontSize: 17, fontWeight: 700, letterSpacing: "-0.01em" }}>
                             {step === "browse" && "Your Cart"}
                             {step === "payment" && "Payment"}
                             {step === "contact" && "Contact Info"}
@@ -538,9 +602,9 @@ export default function KioskClient({
                         {cartCount > 0 && step === "browse" && (
                             <span style={{
                                 marginLeft: "auto",
-                                background: "rgba(59,130,246,0.15)",
-                                color: "#3b82f6", padding: "2px 8px",
-                                borderRadius: 10, fontSize: 11, fontWeight: 700,
+                                background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                                color: "white", padding: "3px 10px",
+                                borderRadius: 12, fontSize: 11, fontWeight: 700,
                             }}>
                                 {cartCount}
                             </span>
@@ -549,45 +613,47 @@ export default function KioskClient({
                 </div>
 
                 {/* Panel Content */}
-                <div style={{ flex: 1, overflow: "auto", padding: "10px 22px" }}>
+                <div style={{ flex: 1, overflow: "auto", padding: "12px 24px" }}>
                     {/* ── Browse: Cart Items ── */}
                     {step === "browse" && cart.length > 0 && (
-                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                             {cart.map((c) => (
                                 <div key={c.inventory.id} style={{
-                                    display: "flex", alignItems: "center", gap: 10,
-                                    padding: "10px 12px",
+                                    display: "flex", alignItems: "center", gap: 12,
+                                    padding: "14px 16px",
                                     background: "rgba(255,255,255,0.03)",
-                                    borderRadius: 10,
-                                    border: "1px solid rgba(255,255,255,0.05)",
+                                    borderRadius: 14,
+                                    border: "1px solid rgba(255,255,255,0.04)",
+                                    transition: "all 0.2s ease",
+                                    animation: "slideInRight 0.3s ease",
                                 }}>
                                     <div style={{
-                                        width: 34, height: 34, borderRadius: 8,
-                                        background: "rgba(59,130,246,0.1)",
+                                        width: 40, height: 40, borderRadius: 12,
+                                        background: "linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.08))",
                                         display: "flex", alignItems: "center",
-                                        justifyContent: "center", fontSize: 18, flexShrink: 0,
+                                        justifyContent: "center", fontSize: 20, flexShrink: 0,
                                     }}>
                                         {getItemEmoji(c.inventory.item_name)}
                                     </div>
                                     <div style={{ flex: 1, minWidth: 0 }}>
                                         <div style={{
-                                            fontSize: 12, fontWeight: 600, color: "#e2e8f0",
+                                            fontSize: 14, fontWeight: 600, color: "#e2e8f0",
                                             whiteSpace: "nowrap", overflow: "hidden",
                                             textOverflow: "ellipsis",
                                         }}>
                                             {c.inventory.item_name}
                                         </div>
-                                        <div style={{ fontSize: 11, color: "#64748b" }}>
-                                            ${Number(c.inventory.price).toFixed(2)} ea
+                                        <div style={{ fontSize: 12, color: "#4b5563", marginTop: 2 }}>
+                                            ${Number(c.inventory.price).toFixed(2)} each
                                         </div>
                                     </div>
-                                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                         <button onClick={() => updateQuantity(c.inventory.id, -1)} style={qtyBtnStyle}>
-                                            <Minus size={12} />
+                                            <Minus size={13} />
                                         </button>
                                         <span style={{
-                                            width: 20, textAlign: "center",
-                                            fontSize: 13, fontWeight: 700, color: "#f1f5f9",
+                                            width: 24, textAlign: "center",
+                                            fontSize: 15, fontWeight: 800, color: "#f1f5f9",
                                         }}>
                                             {c.quantity}
                                         </span>
@@ -601,18 +667,21 @@ export default function KioskClient({
                                                 opacity: c.quantity >= c.inventory.stock_count ? 0.4 : 1,
                                             }}
                                         >
-                                            <Plus size={12} />
+                                            <Plus size={13} />
                                         </button>
                                     </div>
                                     <button onClick={() => removeFromCart(c.inventory.id)} style={{
-                                        background: "none", border: "none",
-                                        color: "#475569", cursor: "pointer", padding: 3,
+                                        background: "rgba(239,68,68,0.08)", border: "none",
+                                        borderRadius: 8, width: 32, height: 32,
+                                        color: "#ef4444", cursor: "pointer",
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                        transition: "all 0.2s ease",
                                     }}>
-                                        <Trash2 size={13} />
+                                        <Trash2 size={14} />
                                     </button>
                                     <div style={{
-                                        fontSize: 13, fontWeight: 700, color: "#f1f5f9",
-                                        minWidth: 45, textAlign: "right",
+                                        fontSize: 15, fontWeight: 700, color: "#f1f5f9",
+                                        minWidth: 55, textAlign: "right",
                                     }}>
                                         ${(Number(c.inventory.price) * c.quantity).toFixed(2)}
                                     </div>
@@ -625,14 +694,14 @@ export default function KioskClient({
                     {step === "payment" && clientSecret && (
                         <div style={{ paddingTop: 8 }}>
                             <div style={{
-                                marginBottom: 16, padding: "12px 16px",
-                                background: "rgba(59,130,246,0.08)",
-                                border: "1px solid rgba(59,130,246,0.15)",
-                                borderRadius: 12,
+                                marginBottom: 20, padding: "16px 20px",
+                                background: "linear-gradient(135deg, rgba(59,130,246,0.06), rgba(139,92,246,0.04))",
+                                border: "1px solid rgba(59,130,246,0.1)",
+                                borderRadius: 16,
                             }}>
-                                <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 4 }}>Amount due</div>
+                                <div style={{ fontSize: 12, color: "#64748b", marginBottom: 6, fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase" }}>Amount due</div>
                                 <div style={{
-                                    fontSize: 28, fontWeight: 800,
+                                    fontSize: 32, fontWeight: 800, letterSpacing: "-0.02em",
                                     background: "linear-gradient(135deg, #10b981, #06b6d4)",
                                     WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
                                 }}>
@@ -645,27 +714,28 @@ export default function KioskClient({
                             </StripeProvider>
 
                             <div style={{
-                                textAlign: "center", marginTop: 16,
-                                padding: "12px 0",
-                                borderTop: "1px solid rgba(255,255,255,0.06)",
+                                textAlign: "center", marginTop: 20,
+                                padding: "16px 0",
+                                borderTop: "1px solid rgba(255,255,255,0.04)",
                             }}>
-                                <span style={{ fontSize: 12, color: "#475569", display: "block", marginBottom: 10 }}>
+                                <span style={{ fontSize: 12, color: "#374151", display: "block", marginBottom: 12, fontWeight: 500 }}>
                                     or pay with cryptocurrency
                                 </span>
                                 <button
                                     onClick={startCoinbaseCheckout}
                                     style={{
-                                        width: "100%", padding: "12px 16px",
-                                        borderRadius: 12,
-                                        border: "1px solid rgba(245,158,11,0.3)",
-                                        background: "rgba(245,158,11,0.08)",
-                                        color: "#fbbf24", fontSize: 14, fontWeight: 600,
+                                        width: "100%", padding: "14px 16px",
+                                        borderRadius: 14,
+                                        border: "1px solid rgba(245,158,11,0.2)",
+                                        background: "rgba(245,158,11,0.06)",
+                                        color: "#fbbf24", fontSize: 14, fontWeight: 700,
                                         cursor: "pointer", display: "flex",
-                                        alignItems: "center", justifyContent: "center", gap: 8,
+                                        alignItems: "center", justifyContent: "center", gap: 10,
+                                        transition: "all 0.2s ease",
                                     }}
                                 >
                                     <Bitcoin size={18} />
-                                    Pay with Crypto (Coinbase)
+                                    Pay with Crypto
                                 </button>
                             </div>
                         </div>
@@ -675,20 +745,42 @@ export default function KioskClient({
                     {step === "contact" && (
                         <div style={{ paddingTop: 8 }}>
                             <div style={{
-                                display: "flex", alignItems: "center", gap: 8,
-                                marginBottom: 16, color: "#10b981",
+                                display: "flex", alignItems: "center", gap: 10,
+                                marginBottom: 20, padding: "12px 16px",
+                                background: "rgba(16,185,129,0.06)",
+                                borderRadius: 12, border: "1px solid rgba(16,185,129,0.12)",
                             }}>
-                                <Check size={18} />
-                                <span style={{ fontSize: 14, fontWeight: 600 }}>Payment successful!</span>
+                                <div style={{
+                                    width: 28, height: 28, borderRadius: 8,
+                                    background: "rgba(16,185,129,0.15)",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                }}>
+                                    <Check size={15} color="#10b981" />
+                                </div>
+                                <span style={{ fontSize: 14, fontWeight: 700, color: "#10b981" }}>Payment successful!</span>
                             </div>
-                            <p style={{ fontSize: 13, color: "#94a3b8", marginBottom: 20 }}>
-                                Enter your contact info for the receipt (optional).
+
+                            {confirmError && (
+                                <div style={{
+                                    display: "flex", alignItems: "center", gap: 8,
+                                    marginBottom: 16, padding: "10px 14px",
+                                    background: "rgba(239,68,68,0.06)",
+                                    borderRadius: 12, border: "1px solid rgba(239,68,68,0.15)",
+                                    color: "#ef4444", fontSize: 13, fontWeight: 500,
+                                }}>
+                                    <AlertCircle size={16} />
+                                    {confirmError}
+                                </div>
+                            )}
+
+                            <p style={{ fontSize: 13, color: "#4b5563", marginBottom: 20, lineHeight: 1.5 }}>
+                                Enter your contact info for a digital receipt.
                             </p>
 
-                            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                                 <div style={{ position: "relative" }}>
                                     <User size={16} style={{
-                                        position: "absolute", left: 12, top: 13, color: "#64748b",
+                                        position: "absolute", left: 14, top: 15, color: "#4b5563",
                                     }} />
                                     <input
                                         type="text"
@@ -700,7 +792,7 @@ export default function KioskClient({
                                 </div>
                                 <div style={{ position: "relative" }}>
                                     <Mail size={16} style={{
-                                        position: "absolute", left: 12, top: 13, color: "#64748b",
+                                        position: "absolute", left: 14, top: 15, color: "#4b5563",
                                     }} />
                                     <input
                                         type="email"
@@ -712,7 +804,7 @@ export default function KioskClient({
                                 </div>
                                 <div style={{ position: "relative" }}>
                                     <Phone size={16} style={{
-                                        position: "absolute", left: 12, top: 13, color: "#64748b",
+                                        position: "absolute", left: 14, top: 15, color: "#4b5563",
                                     }} />
                                     <input
                                         type="tel"
@@ -728,16 +820,19 @@ export default function KioskClient({
                                 onClick={handleContactSubmit}
                                 disabled={confirming}
                                 style={{
-                                    width: "100%", marginTop: 20,
-                                    padding: "14px 0", borderRadius: 14,
+                                    width: "100%", marginTop: 24,
+                                    padding: "16px 0", borderRadius: 16,
                                     border: "none",
                                     background: confirming
-                                        ? "rgba(16,185,129,0.3)"
+                                        ? "rgba(16,185,129,0.2)"
                                         : "linear-gradient(135deg, #10b981, #06b6d4)",
-                                    color: "white", fontSize: 15, fontWeight: 700,
+                                    color: "white", fontSize: 16, fontWeight: 700,
                                     cursor: confirming ? "wait" : "pointer",
                                     display: "flex", alignItems: "center",
-                                    justifyContent: "center", gap: 8,
+                                    justifyContent: "center", gap: 10,
+                                    boxShadow: confirming ? "none" : "0 6px 30px rgba(16,185,129,0.25)",
+                                    transition: "all 0.3s ease",
+                                    letterSpacing: "-0.01em",
                                 }}
                             >
                                 {confirming ? (
@@ -750,10 +845,10 @@ export default function KioskClient({
                             <button
                                 onClick={() => { handleContactSubmit(); }}
                                 style={{
-                                    width: "100%", marginTop: 8, padding: "10px 0",
+                                    width: "100%", marginTop: 10, padding: "12px 0",
                                     background: "none", border: "none",
-                                    color: "#64748b", fontSize: 12, fontWeight: 500,
-                                    cursor: "pointer",
+                                    color: "#374151", fontSize: 13, fontWeight: 500,
+                                    cursor: "pointer", transition: "color 0.2s",
                                 }}
                             >
                                 Skip — no receipt
@@ -765,17 +860,18 @@ export default function KioskClient({
                 {/* Cart Footer (browse step only) */}
                 {step === "browse" && cart.length > 0 && (
                     <div style={{
-                        padding: "18px 22px",
-                        borderTop: "1px solid rgba(255,255,255,0.06)",
-                        background: "rgba(0,0,0,0.15)",
+                        padding: "20px 24px",
+                        borderTop: "1px solid rgba(255,255,255,0.04)",
+                        background: "rgba(0,0,0,0.25)",
+                        backdropFilter: "blur(20px)",
                     }}>
                         <div style={{
                             display: "flex", justifyContent: "space-between",
-                            marginBottom: 14, alignItems: "baseline",
+                            marginBottom: 16, alignItems: "baseline",
                         }}>
-                            <span style={{ fontSize: 13, color: "#94a3b8" }}>Total</span>
+                            <span style={{ fontSize: 14, color: "#64748b", fontWeight: 500 }}>Total</span>
                             <span style={{
-                                fontSize: 22, fontWeight: 800,
+                                fontSize: 26, fontWeight: 800, letterSpacing: "-0.02em",
                                 background: "linear-gradient(135deg, #10b981, #06b6d4)",
                                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
                             }}>
@@ -786,15 +882,19 @@ export default function KioskClient({
                         <button
                             onClick={startStripeCheckout}
                             style={{
-                                width: "100%", padding: "13px 0",
-                                borderRadius: 14, border: "none",
-                                background: "linear-gradient(135deg, #3b82f6, #06b6d4)",
-                                color: "white", fontSize: 15, fontWeight: 700,
+                                width: "100%", padding: "16px 0",
+                                borderRadius: 16, border: "none",
+                                background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                                color: "white", fontSize: 16, fontWeight: 700,
                                 cursor: "pointer", display: "flex",
-                                alignItems: "center", justifyContent: "center", gap: 8,
+                                alignItems: "center", justifyContent: "center", gap: 10,
+                                boxShadow: "0 6px 30px rgba(59,130,246,0.3), 0 0 0 1px rgba(59,130,246,0.2)",
+                                transition: "all 0.2s ease",
+                                letterSpacing: "-0.01em",
+                                animation: "checkoutGlow 2s ease-in-out infinite",
                             }}
                         >
-                            <CreditCard size={17} />
+                            <CreditCard size={18} />
                             Checkout · ${cartTotal.toFixed(2)}
                         </button>
                     </div>
@@ -803,31 +903,42 @@ export default function KioskClient({
 
             <style>{`
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+                @keyframes cardFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+                @keyframes badgePop { from { transform: scale(0); } 50% { transform: scale(1.2); } to { transform: scale(1); } }
+                @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+                @keyframes checkoutGlow {
+                    0%, 100% { box-shadow: 0 6px 30px rgba(59,130,246,0.3), 0 0 0 1px rgba(59,130,246,0.2); }
+                    50% { box-shadow: 0 8px 40px rgba(139,92,246,0.4), 0 0 0 1px rgba(139,92,246,0.3); }
+                }
+                @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
                 button:hover:not(:disabled) { transform: translateY(-1px); }
-                ::-webkit-scrollbar { width: 5px; }
+                button:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+                ::-webkit-scrollbar { width: 4px; }
                 ::-webkit-scrollbar-track { background: transparent; }
-                ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 3px; }
+                ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.04); border-radius: 2px; }
             `}</style>
-        </div >
+        </div>
     );
 }
 
 // ─── Helpers ───────────────────────────────────────────
 const qtyBtnStyle: React.CSSProperties = {
-    width: 26, height: 26, borderRadius: 7,
+    width: 30, height: 30, borderRadius: 9,
     background: "rgba(255,255,255,0.06)",
     border: "none", color: "#94a3b8",
     display: "flex", alignItems: "center",
     justifyContent: "center", cursor: "pointer",
+    transition: "all 0.15s ease",
 };
 
 const inputStyle: React.CSSProperties = {
-    width: "100%", padding: "12px 12px 12px 38px",
-    borderRadius: 12,
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    color: "#e2e8f0", fontSize: 14,
+    width: "100%", padding: "14px 14px 14px 42px",
+    borderRadius: 14,
+    background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(255,255,255,0.06)",
+    color: "#e2e8f0", fontSize: 15,
     outline: "none",
+    transition: "border-color 0.2s ease, background 0.2s ease",
 };
 
 function getItemEmoji(name: string): string {
