@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
     LayoutDashboard,
     Server,
     Package,
     AlertTriangle,
     Snowflake,
+    Menu,
+    X,
 } from "lucide-react";
 
 const navItems = [
@@ -19,19 +22,147 @@ const navItems = [
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const [open, setOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
+    // Detect mobile viewport
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 768);
+        check();
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
+    }, []);
+
+    // Close sidebar on route change (mobile)
+    useEffect(() => {
+        setOpen(false);
+    }, [pathname]);
+
+    // Desktop: always visible
+    if (!isMobile) {
+        return (
+            <aside
+                style={{
+                    width: 260,
+                    minHeight: "100vh",
+                    background: "var(--bg-secondary)",
+                    borderRight: "1px solid var(--border-subtle)",
+                    display: "flex",
+                    flexDirection: "column",
+                    padding: "24px 16px",
+                }}
+            >
+                <SidebarContent pathname={pathname} />
+            </aside>
+        );
+    }
+
+    // Mobile: hamburger + slide-out drawer
     return (
-        <aside
-            style={{
-                width: 260,
-                minHeight: "100vh",
-                background: "var(--bg-secondary)",
-                borderRight: "1px solid var(--border-subtle)",
-                display: "flex",
-                flexDirection: "column",
-                padding: "24px 16px",
-            }}
-        >
+        <>
+            {/* Mobile header bar */}
+            <div
+                style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 56,
+                    background: "var(--bg-secondary)",
+                    borderBottom: "1px solid var(--border-subtle)",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0 16px",
+                    zIndex: 40,
+                    gap: 12,
+                }}
+            >
+                <button
+                    onClick={() => setOpen(true)}
+                    style={{
+                        background: "none",
+                        border: "none",
+                        color: "var(--text-primary)",
+                        cursor: "pointer",
+                        padding: 4,
+                    }}
+                >
+                    <Menu size={22} />
+                </button>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div
+                        style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: 8,
+                            background: "var(--gradient-blue)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Snowflake size={14} color="white" />
+                    </div>
+                    <span style={{ fontSize: 16, fontWeight: 700 }}>OpenFridge</span>
+                </div>
+            </div>
+
+            {/* Overlay */}
+            {open && (
+                <div
+                    onClick={() => setOpen(false)}
+                    style={{
+                        position: "fixed",
+                        inset: 0,
+                        background: "rgba(0,0,0,0.6)",
+                        backdropFilter: "blur(4px)",
+                        zIndex: 45,
+                        animation: "fadeIn 0.2s ease",
+                    }}
+                />
+            )}
+
+            {/* Slide-out drawer */}
+            <aside
+                style={{
+                    position: "fixed",
+                    top: 0,
+                    left: open ? 0 : -280,
+                    width: 270,
+                    height: "100vh",
+                    background: "var(--bg-secondary)",
+                    borderRight: "1px solid var(--border-subtle)",
+                    display: "flex",
+                    flexDirection: "column",
+                    padding: "24px 16px",
+                    zIndex: 50,
+                    transition: "left 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    overflowY: "auto",
+                }}
+            >
+                <button
+                    onClick={() => setOpen(false)}
+                    style={{
+                        position: "absolute",
+                        top: 16,
+                        right: 16,
+                        background: "none",
+                        border: "none",
+                        color: "var(--text-muted)",
+                        cursor: "pointer",
+                    }}
+                >
+                    <X size={18} />
+                </button>
+                <SidebarContent pathname={pathname} />
+            </aside>
+        </>
+    );
+}
+
+function SidebarContent({ pathname }: { pathname: string }) {
+    return (
+        <>
             {/* Logo */}
             <Link
                 href="/dashboard"
@@ -123,6 +254,6 @@ export default function Sidebar() {
                     </div>
                 </div>
             </div>
-        </aside>
+        </>
     );
 }
