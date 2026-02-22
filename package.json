@@ -1,0 +1,14 @@
+{
+  "name": "openfridge",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:portal": "npm run dev --workspace=apps/operator-portal",
+    "dev:kiosk": "npm run start --workspace=apps/kiosk",
+    "build:portal": "npm run build --workspace=apps/operator-portal"
+  }
+}
