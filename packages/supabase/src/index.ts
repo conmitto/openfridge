@@ -6,4 +6,5 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
-export type { Database } from "./types";
+export type { Database, Machine, MachineInsert, Inventory, InventoryInsert, Sale, SaleInsert } from "./types";
+

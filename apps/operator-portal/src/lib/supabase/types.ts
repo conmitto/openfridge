@@ -25,6 +25,7 @@ export interface Database {
                     status?: "active" | "inactive" | "maintenance";
                     created_at?: string;
                 };
+                Relationships: [];
             };
             inventory: {
                 Row: {
@@ -54,6 +55,15 @@ export interface Database {
                     image_url?: string | null;
                     created_at?: string;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: "inventory_machine_id_fkey";
+                        columns: ["machine_id"];
+                        isOneToOne: false;
+                        referencedRelation: "machines";
+                        referencedColumns: ["id"];
+                    }
+                ];
             };
             sales: {
                 Row: {
@@ -86,6 +96,22 @@ export interface Database {
                     payment_method?: "card" | "apple_pay" | "crypto";
                     sold_at?: string;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: "sales_machine_id_fkey";
+                        columns: ["machine_id"];
+                        isOneToOne: false;
+                        referencedRelation: "machines";
+                        referencedColumns: ["id"];
+                    },
+                    {
+                        foreignKeyName: "sales_inventory_id_fkey";
+                        columns: ["inventory_id"];
+                        isOneToOne: false;
+                        referencedRelation: "inventory";
+                        referencedColumns: ["id"];
+                    }
+                ];
             };
         };
         Views: Record<string, never>;
