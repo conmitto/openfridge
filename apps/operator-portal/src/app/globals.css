@@ -33,10 +33,13 @@
   scrollbar-color: var(--bg-card-hover) transparent;
 }
 
+/* ── Default: allow scrolling (overrides Tailwind v4 preflight height:100%) ── */
 html,
 body {
-  height: auto;
-  overflow: visible;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  overflow-y: auto !important;
 }
 
 body {
@@ -45,10 +48,14 @@ body {
   font-family: var(--font-sans, "Inter", system-ui, sans-serif);
 }
 
-/* Portal pages use internal scroll; prevent body scroll only there */
+/* Portal pages: contain scroll inside layout; prevent body scroll */
 body:has(.portal-main) {
-  height: 100%;
-  overflow: hidden;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+body:has(.portal-main) html {
+  height: 100% !important;
 }
 
 /* ── Glass Card ────────────────────────────────────────── */
