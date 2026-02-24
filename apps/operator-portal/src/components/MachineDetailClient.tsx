@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, Trash2, Save } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Save, Tablet, DoorOpen } from "lucide-react";
 import Link from "next/link";
-import type { Machine, Inventory } from "@/lib/supabase/types";
+import type { Machine, Inventory, DoorAccessLog } from "@/lib/supabase/types";
 import { formatCurrency } from "@/lib/utils";
 
 interface MachineDetailClientProps {
@@ -23,8 +23,33 @@ export default function MachineDetailClient({ machine, inventory: initialInvento
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editStock, setEditStock] = useState("");
     const [editPrice, setEditPrice] = useState("");
+    const [ipadPlacement, setIpadPlacement] = useState<string>(machine.ipad_placement ?? "");
+    const [savingPlacement, setSavingPlacement] = useState(false);
+    const [doorLogs, setDoorLogs] = useState<DoorAccessLog[]>([]);
     const router = useRouter();
     const supabase = createClient();
+
+    // Fetch door access logs
+    useEffect(() => {
+        async function fetchLogs() {
+            try {
+                const res = await fetch(`/api/machines/${machine.id}/door-logs?limit=20`);
+                const data = await res.json();
+                if (data.logs) setDoorLogs(data.logs);
+            } catch { /* non-critical */ }
+        }
+        fetchLogs();
+    }, [machine.id]);
+
+    async function handlePlacementChange(placement: string) {
+        setIpadPlacement(placement);
+        setSavingPlacement(true);
+        await supabase
+            .from("machines")
+            .update({ ipad_placement: placement } as any)
+            .eq("id", machine.id);
+        setSavingPlacement(false);
+    }
 
     async function handleAddItem(e: React.FormEvent) {
         e.preventDefault();
@@ -111,6 +136,51 @@ export default function MachineDetailClient({ machine, inventory: initialInvento
                     <button className="btn-primary" onClick={() => setShowAdd(true)}>
                         <Plus size={18} /> Add Item
                     </button>
+                </div>
+            </div>
+
+            {/* iPad Placement Config */}
+            <div className="glass-card" style={{ padding: 24, marginBottom: 24 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                    <Tablet size={18} color="var(--accent-blue)" />
+                    <h3 style={{ fontSize: 16, fontWeight: 600 }}>iPad Placement</h3>
+                    {savingPlacement && (
+                        <span style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>Saving...</span>
+                    )}
+                </div>
+                <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 16 }}>
+                    Where is the iPad positioned relative to the fridge?
+                </p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {(["on_door", "countertop", "mounted"] as const).map((opt) => {
+                        const labels: Record<string, string> = {
+                            on_door: "On the Door",
+                            countertop: "Countertop",
+                            mounted: "Mounted Nearby",
+                        };
+                        const isActive = ipadPlacement === opt;
+                        return (
+                            <button
+                                key={opt}
+                                onClick={() => handlePlacementChange(opt)}
+                                style={{
+                                    padding: "10px 20px", borderRadius: 12,
+                                    fontSize: 13, fontWeight: 600,
+                                    cursor: "pointer",
+                                    transition: "all 0.2s ease",
+                                    background: isActive
+                                        ? "rgba(59,130,246,0.12)"
+                                        : "rgba(255,255,255,0.03)",
+                                    border: isActive
+                                        ? "1px solid rgba(59,130,246,0.3)"
+                                        : "1px solid var(--border-subtle)",
+                                    color: isActive ? "var(--accent-blue)" : "var(--text-secondary)",
+                                }}
+                            >
+                                {labels[opt]}
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -211,6 +281,55 @@ export default function MachineDetailClient({ machine, inventory: initialInvento
                     </tbody>
                 </table>
             </div>
+
+            {/* Door Access Log */}
+            {machine.lock_enabled && (
+                <div className="glass-card" style={{ padding: 24, marginTop: 24 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                        <DoorOpen size={18} color="var(--accent-emerald)" />
+                        <h3 style={{ fontSize: 16, fontWeight: 600 }}>Door Access Log</h3>
+                        <span className="badge badge-active" style={{ marginLeft: "auto" }}>
+                            {doorLogs.length} events
+                        </span>
+                    </div>
+                    {doorLogs.length > 0 ? (
+                        <table className="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Trigger</th>
+                                    <th>Payment ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {doorLogs.map((log) => (
+                                    <tr key={log.id}>
+                                        <td style={{ fontSize: 13 }}>
+                                            {new Date(log.opened_at).toLocaleString()}
+                                        </td>
+                                        <td>
+                                            <span
+                                                className={`badge ${log.trigger === "purchase" ? "badge-active" : "badge-maintenance"}`}
+                                            >
+                                                {log.trigger}
+                                            </span>
+                                        </td>
+                                        <td style={{ fontSize: 12, color: "var(--text-muted)", fontFamily: "monospace" }}>
+                                            {log.payment_intent_id
+                                                ? `${log.payment_intent_id.slice(0, 12)}...`
+                                                : "—"}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p style={{ fontSize: 13, color: "var(--text-muted)", textAlign: "center", padding: 24 }}>
+                            No door access events recorded yet.
+                        </p>
+                    )}
+                </div>
+            )}
 
             {/* Add Item Modal */}
             {showAdd && (

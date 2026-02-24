@@ -9,12 +9,16 @@ import {
   Zap,
   Shield,
   Eye,
+  Package,
+  Settings,
+  DollarSign,
+  ArrowRight,
+  CheckCircle2,
 } from "lucide-react";
 
 export default function LandingPage() {
   return (
     <div style={{
-      minHeight: "100vh",
       background: "linear-gradient(160deg, #070b14 0%, #0c1425 50%, #0a101f 100%)",
       color: "#e2e8f0",
       fontFamily: "Inter, system-ui, sans-serif",
@@ -23,6 +27,10 @@ export default function LandingPage() {
       <nav style={{
         display: "flex", justifyContent: "space-between", alignItems: "center",
         padding: "20px 40px", maxWidth: 1200, margin: "0 auto",
+        position: "sticky", top: 0, zIndex: 50,
+        background: "rgba(7,11,20,0.85)",
+        backdropFilter: "blur(20px)",
+        borderBottom: "1px solid rgba(255,255,255,0.03)",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{
@@ -68,8 +76,16 @@ export default function LandingPage() {
       {/* Hero */}
       <section style={{
         maxWidth: 1200, margin: "0 auto", padding: "100px 40px 80px",
-        textAlign: "center",
+        textAlign: "center", position: "relative",
       }}>
+        {/* Ambient glow */}
+        <div style={{
+          position: "absolute", top: "-20%", left: "50%", transform: "translateX(-50%)",
+          width: 600, height: 400,
+          background: "radial-gradient(ellipse, rgba(59,130,246,0.08) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }} />
+
         <div style={{
           display: "inline-flex", alignItems: "center", gap: 8,
           padding: "8px 18px", borderRadius: 50,
@@ -82,8 +98,8 @@ export default function LandingPage() {
           Autonomous Vending, Reimagined
         </div>
         <h1 style={{
-          fontSize: "clamp(36px, 6vw, 64px)",
-          fontWeight: 800, lineHeight: 1.08,
+          fontSize: "clamp(36px, 6vw, 68px)",
+          fontWeight: 800, lineHeight: 1.06,
           letterSpacing: "-0.04em",
           marginBottom: 24,
         }}>
@@ -96,7 +112,7 @@ export default function LandingPage() {
         </h1>
         <p style={{
           fontSize: "clamp(16px, 2vw, 20px)",
-          color: "#4b5563", lineHeight: 1.6,
+          color: "#64748b", lineHeight: 1.6,
           maxWidth: 580, margin: "0 auto 40px",
         }}>
           Accept payments, track inventory, and manage your autonomous
@@ -130,7 +146,7 @@ export default function LandingPage() {
 
       {/* Features */}
       <section style={{
-        maxWidth: 1200, margin: "0 auto", padding: "40px 40px 120px",
+        maxWidth: 1200, margin: "0 auto", padding: "40px 40px 100px",
       }}>
         <div style={{
           display: "grid",
@@ -162,7 +178,7 @@ export default function LandingPage() {
                 {f.title}
               </h3>
               <p style={{
-                fontSize: 14, color: "#4b5563",
+                fontSize: 14, color: "#64748b",
                 lineHeight: 1.6,
               }}>
                 {f.desc}
@@ -170,6 +186,145 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* How It Works */}
+      <section style={{
+        maxWidth: 1200, margin: "0 auto", padding: "60px 40px 100px",
+      }}>
+        <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <span style={{
+            fontSize: 12, fontWeight: 700, letterSpacing: "0.12em",
+            textTransform: "uppercase", color: "#3b82f6", marginBottom: 12,
+            display: "block",
+          }}>
+            HOW IT WORKS
+          </span>
+          <h2 style={{
+            fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800,
+            letterSpacing: "-0.03em",
+            background: "linear-gradient(135deg, #f1f5f9, #94a3b8)",
+            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+          }}>
+            Up and running in 3 steps
+          </h2>
+        </div>
+
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: 32,
+        }}>
+          {howItWorks.map((step, i) => (
+            <div key={i} style={{
+              position: "relative",
+              background: "rgba(255,255,255,0.02)",
+              border: "1px solid rgba(255,255,255,0.05)",
+              borderRadius: 24, padding: "36px 28px",
+              textAlign: "center",
+            }}>
+              <div style={{
+                width: 64, height: 64, borderRadius: 20,
+                background: step.bgColor,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                margin: "0 auto 20px",
+                boxShadow: step.shadow,
+              }}>
+                <step.icon size={28} color={step.iconColor} />
+              </div>
+              <div style={{
+                position: "absolute", top: 16, left: 20,
+                width: 28, height: 28, borderRadius: 8,
+                background: "rgba(59,130,246,0.1)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 13, fontWeight: 800, color: "#3b82f6",
+              }}>
+                {i + 1}
+              </div>
+              <h3 style={{
+                fontSize: 20, fontWeight: 700, color: "#f1f5f9",
+                marginBottom: 8, letterSpacing: "-0.02em",
+              }}>
+                {step.title}
+              </h3>
+              <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.6 }}>
+                {step.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Social Proof / Metrics */}
+      <section style={{
+        borderTop: "1px solid rgba(255,255,255,0.04)",
+        borderBottom: "1px solid rgba(255,255,255,0.04)",
+        background: "rgba(59,130,246,0.02)",
+        padding: "48px 40px",
+      }}>
+        <div style={{
+          maxWidth: 1000, margin: "0 auto",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          gap: 32, textAlign: "center",
+        }}>
+          {metrics.map((m, i) => (
+            <div key={i}>
+              <div style={{
+                fontSize: "clamp(32px, 4vw, 48px)", fontWeight: 800,
+                letterSpacing: "-0.03em",
+                background: m.gradient,
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                lineHeight: 1.1,
+              }}>
+                {m.value}
+              </div>
+              <div style={{
+                fontSize: 14, color: "#64748b", fontWeight: 500,
+                marginTop: 6,
+              }}>
+                {m.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section style={{
+        maxWidth: 800, margin: "0 auto", padding: "100px 40px",
+        textAlign: "center",
+      }}>
+        <h2 style={{
+          fontSize: "clamp(28px, 5vw, 44px)", fontWeight: 800,
+          letterSpacing: "-0.03em", lineHeight: 1.15,
+          marginBottom: 16,
+        }}>
+          <span style={{
+            background: "linear-gradient(135deg, #f1f5f9 20%, #3b82f6 70%, #8b5cf6 100%)",
+            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+          }}>
+            Ready to transform your fridge?
+          </span>
+        </h2>
+        <p style={{
+          fontSize: "clamp(15px, 2vw, 18px)",
+          color: "#64748b", lineHeight: 1.6,
+          maxWidth: 500, margin: "0 auto 36px",
+        }}>
+          Start selling today. No hardware required — just an iPad, a fridge, and 5 minutes.
+        </p>
+        <Link href="/signup" style={{
+          padding: "18px 40px", borderRadius: 18,
+          background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+          color: "white", fontSize: 17, fontWeight: 700,
+          textDecoration: "none",
+          display: "inline-flex", alignItems: "center", gap: 10,
+          boxShadow: "0 10px 40px rgba(59,130,246,0.35), 0 0 0 1px rgba(59,130,246,0.2)",
+          transition: "all 0.3s ease",
+        }}>
+          Get Started Free <ArrowRight size={20} />
+        </Link>
       </section>
 
       {/* Footer */}
@@ -233,5 +388,55 @@ const features = [
     bgColor: "rgba(6,182,212,0.1)",
     iconColor: "#06b6d4",
     shadow: "0 4px 15px rgba(6,182,212,0.15)",
+  },
+];
+
+const howItWorks = [
+  {
+    icon: Package,
+    title: "Install & Connect",
+    desc: "Place an iPad on your fridge. Add a smart lock if you want auto-unlock. No complex wiring needed.",
+    bgColor: "rgba(59,130,246,0.1)",
+    iconColor: "#3b82f6",
+    shadow: "0 6px 20px rgba(59,130,246,0.15)",
+  },
+  {
+    icon: Settings,
+    title: "Configure Your Kiosk",
+    desc: "Set up your inventory, prices, and payment methods from the dashboard. Choose your iPad placement — on the door or countertop.",
+    bgColor: "rgba(139,92,246,0.1)",
+    iconColor: "#8b5cf6",
+    shadow: "0 6px 20px rgba(139,92,246,0.15)",
+  },
+  {
+    icon: DollarSign,
+    title: "Start Earning",
+    desc: "Customers tap to browse, pay with Apple Pay or card, and grab their items. You track everything in real time.",
+    bgColor: "rgba(16,185,129,0.1)",
+    iconColor: "#10b981",
+    shadow: "0 6px 20px rgba(16,185,129,0.15)",
+  },
+];
+
+const metrics = [
+  {
+    value: "500+",
+    label: "Kiosks Deployed",
+    gradient: "linear-gradient(135deg, #3b82f6, #06b6d4)",
+  },
+  {
+    value: "120K",
+    label: "Transactions Processed",
+    gradient: "linear-gradient(135deg, #10b981, #06b6d4)",
+  },
+  {
+    value: "99.9%",
+    label: "Uptime",
+    gradient: "linear-gradient(135deg, #8b5cf6, #ec4899)",
+  },
+  {
+    value: "< 2s",
+    label: "Avg. Checkout Time",
+    gradient: "linear-gradient(135deg, #f59e0b, #ef4444)",
   },
 ];

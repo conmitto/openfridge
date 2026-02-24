@@ -13,15 +13,17 @@ import {
     X,
     Bot,
     LogOut,
+    Settings,
 } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 
 const navItems = [
+    { href: "/agent", label: "Agent", icon: Bot },
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/machines", label: "Machines", icon: Server },
     { href: "/inventory", label: "Inventory", icon: Package },
     { href: "/restock", label: "Restock", icon: AlertTriangle },
-    { href: "/agent", label: "Agent", icon: Bot },
+    { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export default function Sidebar() {

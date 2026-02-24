@@ -16,6 +16,7 @@ export interface Database {
                     lock_api_url: string | null;
                     lock_api_key: string | null;
                     lock_duration_sec: number;
+                    ipad_placement: "on_door" | "countertop" | "mounted" | null;
                     created_at: string;
                 };
                 Insert: {
@@ -30,6 +31,7 @@ export interface Database {
                     lock_api_url?: string | null;
                     lock_api_key?: string | null;
                     lock_duration_sec?: number;
+                    ipad_placement?: "on_door" | "countertop" | "mounted" | null;
                     created_at?: string;
                 };
                 Update: {
@@ -44,6 +46,7 @@ export interface Database {
                     lock_api_url?: string | null;
                     lock_api_key?: string | null;
                     lock_duration_sec?: number;
+                    ipad_placement?: "on_door" | "countertop" | "mounted" | null;
                     created_at?: string;
                 };
                 Relationships: [];
@@ -54,8 +57,11 @@ export interface Database {
                     machine_id: string;
                     item_name: string;
                     price: number;
+                    purchase_price: number | null;
                     stock_count: number;
                     image_url: string | null;
+                    description: string | null;
+                    reorder_url: string | null;
                     created_at: string;
                 };
                 Insert: {
@@ -63,8 +69,11 @@ export interface Database {
                     machine_id: string;
                     item_name: string;
                     price: number;
+                    purchase_price?: number | null;
                     stock_count?: number;
                     image_url?: string | null;
+                    description?: string | null;
+                    reorder_url?: string | null;
                     created_at?: string;
                 };
                 Update: {
@@ -72,8 +81,11 @@ export interface Database {
                     machine_id?: string;
                     item_name?: string;
                     price?: number;
+                    purchase_price?: number | null;
                     stock_count?: number;
                     image_url?: string | null;
+                    description?: string | null;
+                    reorder_url?: string | null;
                     created_at?: string;
                 };
                 Relationships: [
@@ -161,6 +173,62 @@ export interface Database {
                 };
                 Relationships: [];
             };
+            door_access_logs: {
+                Row: {
+                    id: string;
+                    machine_id: string;
+                    payment_intent_id: string | null;
+                    trigger: "purchase" | "manual";
+                    opened_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    machine_id: string;
+                    payment_intent_id?: string | null;
+                    trigger?: "purchase" | "manual";
+                    opened_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    machine_id?: string;
+                    payment_intent_id?: string | null;
+                    trigger?: "purchase" | "manual";
+                    opened_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: "door_access_logs_machine_id_fkey";
+                        columns: ["machine_id"];
+                        isOneToOne: false;
+                        referencedRelation: "machines";
+                        referencedColumns: ["id"];
+                    }
+                ];
+            };
+            api_keys: {
+                Row: {
+                    id: string;
+                    user_id: string;
+                    provider: "openai" | "anthropic";
+                    api_key: string;
+                    created_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    user_id: string;
+                    provider: "openai" | "anthropic";
+                    api_key: string;
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    user_id?: string;
+                    provider?: "openai" | "anthropic";
+                    api_key?: string;
+                    created_at?: string;
+                };
+                Relationships: [];
+            };
         };
         Views: Record<string, never>;
         Functions: Record<string, never>;
@@ -177,3 +245,7 @@ export type Sale = Database["public"]["Tables"]["sales"]["Row"];
 export type SaleInsert = Database["public"]["Tables"]["sales"]["Insert"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"];
+export type DoorAccessLog = Database["public"]["Tables"]["door_access_logs"]["Row"];
+export type DoorAccessLogInsert = Database["public"]["Tables"]["door_access_logs"]["Insert"];
+export type ApiKey = Database["public"]["Tables"]["api_keys"]["Row"];
+export type ApiKeyInsert = Database["public"]["Tables"]["api_keys"]["Insert"];

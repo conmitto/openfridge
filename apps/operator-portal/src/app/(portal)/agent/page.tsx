@@ -56,10 +56,19 @@ export default function AgentPage() {
         setLoading(true);
         const newAlerts: AlertCard[] = [];
 
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id ?? "";
+
+        // Get user's machine IDs
+        const { data: machineRows } = await supabase.from("machines").select("id").eq("owner_id", userId);
+        const machineIds = (machineRows ?? []).map((m: { id: string }) => m.id);
+        const safeIds = machineIds.length > 0 ? machineIds : ["none"];
+
         // Low stock alerts
         const { data: inventory } = await supabase
             .from("inventory")
             .select("*, machines(name)")
+            .in("machine_id", safeIds)
             .lte("stock_count", 3)
             .order("stock_count", { ascending: true });
 
@@ -82,6 +91,7 @@ export default function AgentPage() {
         const { data: machines } = await supabase
             .from("machines")
             .select("name, status, location")
+            .eq("owner_id", userId)
             .neq("status", "active");
 
         if (machines?.length) {
@@ -101,6 +111,7 @@ export default function AgentPage() {
         const { data: todaySales } = await supabase
             .from("sales")
             .select("total_price, quantity")
+            .in("machine_id", safeIds)
             .gte("sold_at", today.toISOString());
 
         const totalRevenue = todaySales?.reduce((s, r) => s + Number(r.total_price), 0) ?? 0;

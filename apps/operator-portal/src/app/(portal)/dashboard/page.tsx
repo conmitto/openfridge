@@ -8,11 +8,17 @@ import type { Sale, Machine, Inventory } from "@/lib/supabase/types";
 export default async function DashboardPage() {
     const supabase = await createClient();
 
-    // Fetch stats in parallel
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id ?? "";
+
+    // Fetch stats in parallel — scoped to this user's machines
+    const machineIds = await supabase.from("machines").select("id").eq("owner_id", userId);
+    const ids = (machineIds.data ?? []).map((m: { id: string }) => m.id);
+
     const [salesRes, machinesRes, lowStockRes] = await Promise.all([
-        supabase.from("sales").select("*").order("sold_at", { ascending: false }),
-        supabase.from("machines").select("*").eq("status", "active"),
-        supabase.from("inventory").select("*").lte("stock_count", 5),
+        supabase.from("sales").select("*").in("machine_id", ids).order("sold_at", { ascending: false }),
+        supabase.from("machines").select("*").eq("owner_id", userId).eq("status", "active"),
+        supabase.from("inventory").select("*").in("machine_id", ids).lte("stock_count", 5),
     ]);
 
     const sales = (salesRes.data ?? []) as Sale[];

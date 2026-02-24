@@ -47,6 +47,15 @@ export async function POST(req: NextRequest) {
         // Attempt smart lock unlock (non-blocking if not configured)
         const lockResult = await unlockMachine(machineId);
 
+        // Log door access if unlocked
+        if (lockResult.unlocked) {
+            await supabase.from("door_access_logs").insert({
+                machine_id: machineId,
+                payment_intent_id: paymentIntentId,
+                trigger: "purchase" as const,
+            });
+        }
+
         return NextResponse.json({
             success: true,
             orderId: paymentIntentId,

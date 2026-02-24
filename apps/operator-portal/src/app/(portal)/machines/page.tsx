@@ -5,13 +5,19 @@ import type { Machine } from "@/lib/supabase/types";
 export default async function MachinesPage() {
     const supabase = await createClient();
 
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id ?? "";
+
     const { data: machines } = await supabase
         .from("machines")
         .select("*")
+        .eq("owner_id", userId)
         .order("created_at", { ascending: false });
 
-    // Get inventory counts per machine
-    const { data: inventory } = await supabase.from("inventory").select("machine_id");
+    const machineIds = ((machines ?? []) as Machine[]).map((m) => m.id);
+
+    // Get inventory counts per machine (only for user's machines)
+    const { data: inventory } = await supabase.from("inventory").select("machine_id").in("machine_id", machineIds.length > 0 ? machineIds : ["none"]);
 
     const countMap = new Map<string, number>();
     ((inventory ?? []) as { machine_id: string }[]).forEach((item) => {

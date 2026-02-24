@@ -11,10 +11,14 @@ interface LowStockItem extends Inventory {
 export default async function RestockPage() {
     const supabase = await createClient();
 
-    // Get all inventory with low stock (≤ 5), joined with machine names
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id ?? "";
+
+    // Get all inventory with low stock (≤ 5), joined with machine names — scoped to user
     const { data: rawItems } = await supabase
         .from("inventory")
-        .select("*, machines(name, location)")
+        .select("*, machines!inner(name, location, owner_id)")
+        .eq("machines.owner_id", userId)
         .lte("stock_count", 5)
         .order("stock_count", { ascending: true });
 

@@ -33,6 +33,12 @@
   scrollbar-color: var(--bg-card-hover) transparent;
 }
 
+html,
+body {
+  height: auto;
+  overflow: visible;
+}
+
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -41,6 +47,7 @@ body {
 
 /* Portal pages use internal scroll; prevent body scroll only there */
 body:has(.portal-main) {
+  height: 100%;
   overflow: hidden;
 }
 
