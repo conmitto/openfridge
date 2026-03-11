@@ -47,14 +47,52 @@ CREATE TABLE IF NOT EXISTS sales (
 CREATE INDEX idx_sales_machine_id ON sales(machine_id);
 CREATE INDEX idx_sales_sold_at ON sales(sold_at);
 
+-- ── Profiles ────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  full_name TEXT,
+  company_name TEXT,
+  avatar_url TEXT,
+  onboarded BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ── Door Access Logs ────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS door_access_logs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  machine_id UUID NOT NULL REFERENCES machines(id) ON DELETE CASCADE,
+  payment_intent_id TEXT,
+  trigger TEXT NOT NULL DEFAULT 'purchase' CHECK (trigger IN ('purchase', 'manual')),
+  opened_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_door_access_logs_machine_id ON door_access_logs(machine_id);
+
+-- ── API Keys ────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS api_keys (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  provider TEXT NOT NULL CHECK (provider IN ('openai', 'anthropic')),
+  api_key TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_api_keys_user_id ON api_keys(user_id);
+
 -- ── Row Level Security (open for now) ───────────────────────
 ALTER TABLE machines ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inventory ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sales ENABLE ROW LEVEL SECURITY;
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE door_access_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE api_keys ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Allow all on machines" ON machines FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all on inventory" ON inventory FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all on sales" ON sales FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all on profiles" ON profiles FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all on door_access_logs" ON door_access_logs FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all on api_keys" ON api_keys FOR ALL USING (true) WITH CHECK (true);
 
 -- ── Seed Data ──────────────────────────────────────────────
 INSERT INTO machines (id, name, location, status) VALUES
