@@ -9,6 +9,7 @@
   "scripts": {
     "dev:portal": "npm run dev --workspace=apps/operator-portal",
     "dev:kiosk": "npm run start --workspace=apps/kiosk",
-    "build:portal": "npm run build --workspace=apps/operator-portal"
+    "build:portal": "npm run build --workspace=apps/operator-portal",
+    "vercel-build": "npm run build --workspace=apps/operator-portal"
   }
 }
