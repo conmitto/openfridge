@@ -13,329 +13,396 @@ import {
   Settings,
   DollarSign,
   ArrowRight,
-  CheckCircle2,
+  ExternalLink,
+  FileText,
 } from "lucide-react";
 
 export default function LandingPage() {
   return (
     <div style={{
-      background: "linear-gradient(160deg, #070b14 0%, #0c1425 50%, #0a101f 100%)",
       color: "#e2e8f0",
       fontFamily: "Inter, system-ui, sans-serif",
+      position: "relative",
     }}>
-      {/* Nav */}
-      <nav style={{
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        padding: "20px 40px", maxWidth: 1200, margin: "0 auto",
-        position: "sticky", top: 0, zIndex: 50,
-        background: "rgba(7,11,20,0.85)",
-        backdropFilter: "blur(20px)",
-        borderBottom: "1px solid rgba(255,255,255,0.03)",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{
-            width: 40, height: 40, borderRadius: 12,
-            background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: "0 4px 15px rgba(59,130,246,0.3)",
-          }}>
-            <Snowflake size={20} color="white" />
+      {/* Animated mesh background */}
+      <div className="landing-bg" />
+      {/* Noise texture overlay */}
+      <div className="landing-noise" />
+
+      {/* All content above the bg layers */}
+      <div style={{ position: "relative", zIndex: 2 }}>
+
+        {/* Nav */}
+        <nav className="landing-nav" style={{
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          padding: "20px 40px", maxWidth: 1200, margin: "0 auto",
+          position: "sticky", top: 0, zIndex: 50,
+          background: "rgba(5,8,16,0.8)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          borderBottom: "1px solid rgba(255,255,255,0.04)",
+        }}>
+          <div className="landing-nav-logo" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 12,
+              background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 4px 20px rgba(59,130,246,0.25)",
+            }}>
+              <Snowflake size={20} color="white" />
+            </div>
+            <span style={{
+              fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em",
+              background: "linear-gradient(135deg, #f1f5f9, #94a3b8)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            }}>
+              OpenFridge
+            </span>
+            <span style={{
+              fontSize: 11, fontWeight: 500, color: "#475569",
+              marginLeft: 2, letterSpacing: "0.02em",
+            }}>
+              by{" "}
+              <a
+                href="https://conmitto.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#64748b", textDecoration: "none", transition: "color 0.2s" }}
+              >
+                Conmitto
+              </a>
+            </span>
           </div>
-          <span style={{
-            fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em",
-            background: "linear-gradient(135deg, #f1f5f9, #94a3b8)",
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          }}>
-            OpenFridge
-          </span>
-        </div>
-        <div style={{ display: "flex", gap: 12 }}>
-          <Link href="/login" style={{
-            padding: "10px 20px", borderRadius: 12,
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            color: "#94a3b8", fontSize: 14, fontWeight: 600,
-            textDecoration: "none",
-            transition: "all 0.2s ease",
-          }}>
-            Sign In
-          </Link>
-          <Link href="/signup" style={{
-            padding: "10px 20px", borderRadius: 12,
-            background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-            color: "white", fontSize: 14, fontWeight: 600,
-            textDecoration: "none",
-            boxShadow: "0 4px 15px rgba(59,130,246,0.3)",
-            transition: "all 0.2s ease",
-          }}>
-            Get Started
-          </Link>
-        </div>
-      </nav>
+          <div className="landing-nav-buttons" style={{ display: "flex", gap: 12 }}>
+            <Link href="/login" style={{
+              padding: "10px 20px", borderRadius: 12,
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "#94a3b8", fontSize: 14, fontWeight: 600,
+              textDecoration: "none",
+              transition: "all 0.2s ease",
+            }}>
+              Sign In
+            </Link>
+            <Link href="/signup" className="landing-cta" style={{
+              padding: "10px 20px", borderRadius: 12,
+              background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+              color: "white", fontSize: 14, fontWeight: 600,
+              textDecoration: "none",
+              boxShadow: "0 4px 20px rgba(59,130,246,0.25)",
+            }}>
+              Get Started
+            </Link>
+          </div>
+        </nav>
 
-      {/* Hero */}
-      <section style={{
-        maxWidth: 1200, margin: "0 auto", padding: "100px 40px 80px",
-        textAlign: "center", position: "relative",
-      }}>
-        {/* Ambient glow */}
-        <div style={{
-          position: "absolute", top: "-20%", left: "50%", transform: "translateX(-50%)",
-          width: 600, height: 400,
-          background: "radial-gradient(ellipse, rgba(59,130,246,0.08) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }} />
+        {/* Hero */}
+        <section className="landing-hero" style={{
+          maxWidth: 1200, margin: "0 auto", padding: "120px 40px 80px",
+          textAlign: "center", position: "relative",
+        }}>
+          {/* Ambient glow */}
+          <div style={{
+            position: "absolute", top: "-30%", left: "50%", transform: "translateX(-50%)",
+            width: 800, height: 500,
+            background: "radial-gradient(ellipse, rgba(59,130,246,0.07) 0%, rgba(139,92,246,0.04) 40%, transparent 70%)",
+            pointerEvents: "none",
+          }} />
 
-        <div style={{
-          display: "inline-flex", alignItems: "center", gap: 8,
-          padding: "8px 18px", borderRadius: 50,
-          background: "rgba(59,130,246,0.08)",
-          border: "1px solid rgba(59,130,246,0.15)",
-          color: "#60a5fa", fontSize: 13, fontWeight: 600,
-          marginBottom: 28,
-        }}>
-          <Zap size={14} />
-          Autonomous Vending, Reimagined
-        </div>
-        <h1 style={{
-          fontSize: "clamp(36px, 6vw, 68px)",
-          fontWeight: 800, lineHeight: 1.06,
-          letterSpacing: "-0.04em",
-          marginBottom: 24,
-        }}>
-          <span style={{
-            background: "linear-gradient(135deg, #f1f5f9 30%, #3b82f6 60%, #8b5cf6 100%)",
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          }}>
-            Turn any fridge into<br />a smart vending kiosk
-          </span>
-        </h1>
-        <p style={{
-          fontSize: "clamp(16px, 2vw, 20px)",
-          color: "#64748b", lineHeight: 1.6,
-          maxWidth: 580, margin: "0 auto 40px",
-        }}>
-          Accept payments, track inventory, and manage your autonomous
-          vending machines from one beautiful dashboard.
-        </p>
-        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-          <Link href="/signup" style={{
-            padding: "16px 32px", borderRadius: 16,
-            background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-            color: "white", fontSize: 16, fontWeight: 700,
-            textDecoration: "none",
+          <div className="landing-badge" style={{
             display: "inline-flex", alignItems: "center", gap: 8,
-            boxShadow: "0 8px 30px rgba(59,130,246,0.3), 0 0 0 1px rgba(59,130,246,0.2)",
-            transition: "all 0.3s ease",
+            padding: "10px 22px", borderRadius: 50,
+            background: "rgba(59,130,246,0.07)",
+            border: "1px solid rgba(59,130,246,0.12)",
+            color: "#60a5fa", fontSize: 13, fontWeight: 600,
+            marginBottom: 32,
+            backdropFilter: "blur(8px)",
           }}>
-            Start Free <ChevronRight size={18} />
-          </Link>
-          <Link href="/kiosk/a1b2c3d4-0001-4000-8000-000000000001" style={{
-            padding: "16px 32px", borderRadius: 16,
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            color: "#94a3b8", fontSize: 16, fontWeight: 600,
-            textDecoration: "none",
-            display: "inline-flex", alignItems: "center", gap: 8,
-            transition: "all 0.3s ease",
+            <Zap size={14} />
+            Autonomous Vending, Reimagined
+          </div>
+          <h1 style={{
+            fontSize: "clamp(36px, 6vw, 72px)",
+            fontWeight: 800, lineHeight: 1.04,
+            letterSpacing: "-0.045em",
+            marginBottom: 28,
           }}>
-            <Eye size={18} /> View Demo Kiosk
-          </Link>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section style={{
-        maxWidth: 1200, margin: "0 auto", padding: "40px 40px 100px",
-      }}>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: 20,
-        }}>
-          {features.map((f, i) => (
-            <div key={i} style={{
-              background: "rgba(255,255,255,0.02)",
-              border: "1px solid rgba(255,255,255,0.05)",
-              borderRadius: 24, padding: "32px 28px",
-              backdropFilter: "blur(12px)",
+            <span style={{
+              background: "linear-gradient(140deg, #ffffff 0%, #e2e8f0 25%, #3b82f6 55%, #8b5cf6 85%, #c084fc 100%)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            }}>
+              Turn any fridge into<br />a smart vending kiosk
+            </span>
+          </h1>
+          <p style={{
+            fontSize: "clamp(16px, 2vw, 20px)",
+            color: "#64748b", lineHeight: 1.7,
+            maxWidth: 560, margin: "0 auto 44px",
+            letterSpacing: "-0.01em",
+          }}>
+            Accept payments, track inventory, and manage your autonomous
+            vending machines from one beautiful dashboard.
+          </p>
+          <div className="landing-hero-buttons" style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
+            <Link href="/signup" className="landing-cta" style={{
+              padding: "18px 36px", borderRadius: 18,
+              background: "linear-gradient(135deg, #3b82f6, #7c3aed)",
+              color: "white", fontSize: 16, fontWeight: 700,
+              textDecoration: "none",
+              display: "inline-flex", alignItems: "center", gap: 10,
+              boxShadow: "0 8px 30px rgba(59,130,246,0.3), 0 0 0 1px rgba(59,130,246,0.15)",
+              letterSpacing: "-0.01em",
+            }}>
+              Start Free <ChevronRight size={18} />
+            </Link>
+            <Link href="/kiosk/a1b2c3d4-0001-4000-8000-000000000001" style={{
+              padding: "18px 36px", borderRadius: 18,
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "#94a3b8", fontSize: 16, fontWeight: 600,
+              textDecoration: "none",
+              display: "inline-flex", alignItems: "center", gap: 10,
               transition: "all 0.3s ease",
+              backdropFilter: "blur(8px)",
             }}>
-              <div style={{
-                width: 52, height: 52, borderRadius: 16,
-                background: f.bgColor, display: "flex",
-                alignItems: "center", justifyContent: "center",
-                marginBottom: 20,
-                boxShadow: f.shadow,
-              }}>
-                <f.icon size={24} color={f.iconColor} />
-              </div>
-              <h3 style={{
-                fontSize: 18, fontWeight: 700,
-                color: "#f1f5f9", marginBottom: 8,
-                letterSpacing: "-0.02em",
-              }}>
-                {f.title}
-              </h3>
-              <p style={{
-                fontSize: 14, color: "#64748b",
-                lineHeight: 1.6,
-              }}>
-                {f.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
+              <Eye size={18} /> View Demo Kiosk
+            </Link>
+          </div>
+        </section>
 
-      {/* How It Works */}
-      <section style={{
-        maxWidth: 1200, margin: "0 auto", padding: "60px 40px 100px",
-      }}>
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <span style={{
-            fontSize: 12, fontWeight: 700, letterSpacing: "0.12em",
-            textTransform: "uppercase", color: "#3b82f6", marginBottom: 12,
-            display: "block",
+        {/* Divider */}
+        <div className="landing-divider" />
+
+        {/* Features */}
+        <section className="landing-features" style={{
+          maxWidth: 1200, margin: "0 auto", padding: "80px 40px 100px",
+        }}>
+          <div style={{ textAlign: "center", marginBottom: 56 }}>
+            <span style={{
+              fontSize: 12, fontWeight: 700, letterSpacing: "0.14em",
+              textTransform: "uppercase", color: "#3b82f6", marginBottom: 14,
+              display: "block",
+            }}>
+              FEATURES
+            </span>
+            <h2 style={{
+              fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800,
+              letterSpacing: "-0.03em",
+              background: "linear-gradient(135deg, #f1f5f9, #94a3b8)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            }}>
+              Everything you need to sell smarter
+            </h2>
+          </div>
+          <div className="landing-features-grid" style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: 20,
           }}>
-            HOW IT WORKS
-          </span>
+            {features.map((f, i) => (
+              <div key={i} className="landing-card">
+                <div style={{
+                  width: 52, height: 52, borderRadius: 16,
+                  background: f.bgColor, display: "flex",
+                  alignItems: "center", justifyContent: "center",
+                  marginBottom: 20,
+                  boxShadow: f.shadow,
+                }}>
+                  <f.icon size={24} color={f.iconColor} />
+                </div>
+                <h3 style={{
+                  fontSize: 18, fontWeight: 700,
+                  color: "#f1f5f9", marginBottom: 10,
+                  letterSpacing: "-0.02em",
+                }}>
+                  {f.title}
+                </h3>
+                <p style={{
+                  fontSize: 14, color: "#64748b",
+                  lineHeight: 1.7,
+                }}>
+                  {f.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Divider */}
+        <div className="landing-divider" />
+
+        {/* How It Works */}
+        <section className="landing-section" style={{
+          maxWidth: 1200, margin: "0 auto", padding: "80px 40px 100px",
+        }}>
+          <div style={{ textAlign: "center", marginBottom: 56 }}>
+            <span style={{
+              fontSize: 12, fontWeight: 700, letterSpacing: "0.14em",
+              textTransform: "uppercase", color: "#3b82f6", marginBottom: 14,
+              display: "block",
+            }}>
+              HOW IT WORKS
+            </span>
+            <h2 style={{
+              fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800,
+              letterSpacing: "-0.03em",
+              background: "linear-gradient(135deg, #f1f5f9, #94a3b8)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            }}>
+              Up and running in 3 steps
+            </h2>
+          </div>
+
+          <div className="landing-steps-grid" style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: 32,
+          }}>
+            {howItWorks.map((step, i) => (
+              <div key={i} className="landing-card" style={{
+                textAlign: "center",
+              }}>
+                <div style={{
+                  width: 64, height: 64, borderRadius: 20,
+                  background: step.bgColor,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  margin: "0 auto 20px",
+                  boxShadow: step.shadow,
+                }}>
+                  <step.icon size={28} color={step.iconColor} />
+                </div>
+                <div style={{
+                  position: "absolute", top: 16, left: 20,
+                  width: 28, height: 28, borderRadius: 8,
+                  background: "rgba(59,130,246,0.1)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 13, fontWeight: 800, color: "#3b82f6",
+                }}>
+                  {i + 1}
+                </div>
+                <h3 style={{
+                  fontSize: 20, fontWeight: 700, color: "#f1f5f9",
+                  marginBottom: 10, letterSpacing: "-0.02em",
+                }}>
+                  {step.title}
+                </h3>
+                <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.7 }}>
+                  {step.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Divider */}
+        <div className="landing-divider" />
+
+        {/* Notion Doc Link */}
+        <section className="landing-notion-section" style={{
+          maxWidth: 700, margin: "0 auto", padding: "0 40px",
+          marginTop: 80,
+        }}>
+          <a
+            href="https://tinyurl.com/open-fridge"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="landing-notion-card"
+            style={{
+              display: "flex", alignItems: "center", gap: 20,
+              padding: "24px 28px",
+              textDecoration: "none",
+              color: "inherit",
+            }}
+          >
+            <div style={{
+              width: 52, height: 52, borderRadius: 16, flexShrink: 0,
+              background: "rgba(59,130,246,0.1)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 4px 15px rgba(59,130,246,0.12)",
+            }}>
+              <FileText size={24} color="#3b82f6" />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{
+                fontSize: 16, fontWeight: 700, color: "#f1f5f9",
+                marginBottom: 4, letterSpacing: "-0.02em",
+              }}>
+                Product Overview
+              </div>
+              <div style={{
+                fontSize: 13, color: "#64748b", lineHeight: 1.5,
+              }}>
+                Read the full OpenFridge product doc — features, architecture, and roadmap.
+              </div>
+            </div>
+            <ExternalLink size={18} color="#475569" style={{ flexShrink: 0 }} />
+          </a>
+        </section>
+
+        {/* Final CTA */}
+        <section className="landing-cta-section" style={{
+          maxWidth: 800, margin: "0 auto", padding: "100px 40px",
+          textAlign: "center",
+        }}>
           <h2 style={{
-            fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800,
-            letterSpacing: "-0.03em",
-            background: "linear-gradient(135deg, #f1f5f9, #94a3b8)",
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            fontSize: "clamp(28px, 5vw, 48px)", fontWeight: 800,
+            letterSpacing: "-0.04em", lineHeight: 1.12,
+            marginBottom: 18,
           }}>
-            Up and running in 3 steps
-          </h2>
-        </div>
-
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: 32,
-        }}>
-          {howItWorks.map((step, i) => (
-            <div key={i} style={{
-              position: "relative",
-              background: "rgba(255,255,255,0.02)",
-              border: "1px solid rgba(255,255,255,0.05)",
-              borderRadius: 24, padding: "36px 28px",
-              textAlign: "center",
+            <span style={{
+              background: "linear-gradient(140deg, #ffffff 10%, #e2e8f0 30%, #3b82f6 65%, #8b5cf6 90%)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
             }}>
-              <div style={{
-                width: 64, height: 64, borderRadius: 20,
-                background: step.bgColor,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                margin: "0 auto 20px",
-                boxShadow: step.shadow,
-              }}>
-                <step.icon size={28} color={step.iconColor} />
-              </div>
-              <div style={{
-                position: "absolute", top: 16, left: 20,
-                width: 28, height: 28, borderRadius: 8,
-                background: "rgba(59,130,246,0.1)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 13, fontWeight: 800, color: "#3b82f6",
-              }}>
-                {i + 1}
-              </div>
-              <h3 style={{
-                fontSize: 20, fontWeight: 700, color: "#f1f5f9",
-                marginBottom: 8, letterSpacing: "-0.02em",
-              }}>
-                {step.title}
-              </h3>
-              <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.6 }}>
-                {step.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Social Proof / Metrics */}
-      <section style={{
-        borderTop: "1px solid rgba(255,255,255,0.04)",
-        borderBottom: "1px solid rgba(255,255,255,0.04)",
-        background: "rgba(59,130,246,0.02)",
-        padding: "48px 40px",
-      }}>
-        <div style={{
-          maxWidth: 1000, margin: "0 auto",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: 32, textAlign: "center",
-        }}>
-          {metrics.map((m, i) => (
-            <div key={i}>
-              <div style={{
-                fontSize: "clamp(32px, 4vw, 48px)", fontWeight: 800,
-                letterSpacing: "-0.03em",
-                background: m.gradient,
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                lineHeight: 1.1,
-              }}>
-                {m.value}
-              </div>
-              <div style={{
-                fontSize: 14, color: "#64748b", fontWeight: 500,
-                marginTop: 6,
-              }}>
-                {m.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section style={{
-        maxWidth: 800, margin: "0 auto", padding: "100px 40px",
-        textAlign: "center",
-      }}>
-        <h2 style={{
-          fontSize: "clamp(28px, 5vw, 44px)", fontWeight: 800,
-          letterSpacing: "-0.03em", lineHeight: 1.15,
-          marginBottom: 16,
-        }}>
-          <span style={{
-            background: "linear-gradient(135deg, #f1f5f9 20%, #3b82f6 70%, #8b5cf6 100%)",
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              Ready to transform your fridge?
+            </span>
+          </h2>
+          <p style={{
+            fontSize: "clamp(15px, 2vw, 18px)",
+            color: "#64748b", lineHeight: 1.7,
+            maxWidth: 500, margin: "0 auto 40px",
           }}>
-            Ready to transform your fridge?
-          </span>
-        </h2>
-        <p style={{
-          fontSize: "clamp(15px, 2vw, 18px)",
-          color: "#64748b", lineHeight: 1.6,
-          maxWidth: 500, margin: "0 auto 36px",
-        }}>
-          Start selling today. No hardware required — just an iPad, a fridge, and 5 minutes.
-        </p>
-        <Link href="/signup" style={{
-          padding: "18px 40px", borderRadius: 18,
-          background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-          color: "white", fontSize: 17, fontWeight: 700,
-          textDecoration: "none",
-          display: "inline-flex", alignItems: "center", gap: 10,
-          boxShadow: "0 10px 40px rgba(59,130,246,0.35), 0 0 0 1px rgba(59,130,246,0.2)",
-          transition: "all 0.3s ease",
-        }}>
-          Get Started Free <ArrowRight size={20} />
-        </Link>
-      </section>
+            Start selling today. No hardware required — just an iPad, a fridge, and 5 minutes.
+          </p>
+          <Link href="/signup" className="landing-cta" style={{
+            padding: "20px 44px", borderRadius: 20,
+            background: "linear-gradient(135deg, #3b82f6, #7c3aed)",
+            color: "white", fontSize: 17, fontWeight: 700,
+            textDecoration: "none",
+            display: "inline-flex", alignItems: "center", gap: 10,
+            boxShadow: "0 10px 40px rgba(59,130,246,0.3), 0 0 0 1px rgba(59,130,246,0.15)",
+            letterSpacing: "-0.01em",
+          }}>
+            Get Started Free <ArrowRight size={20} />
+          </Link>
+        </section>
 
-      {/* Footer */}
-      <footer style={{
-        borderTop: "1px solid rgba(255,255,255,0.04)",
-        padding: "32px 40px",
-        textAlign: "center",
-        color: "#334155", fontSize: 13,
-      }}>
-        © 2025 OpenFridge · Built for autonomous vending
-      </footer>
+        {/* Footer */}
+        <footer className="landing-footer" style={{
+          padding: "36px 40px",
+          textAlign: "center",
+          color: "#334155", fontSize: 13,
+        }}>
+          <div className="landing-divider" style={{ marginBottom: 28 }} />
+          <div style={{
+            display: "flex", justifyContent: "center", alignItems: "center",
+            gap: 6, flexWrap: "wrap",
+          }}>
+            <span>© 2026</span>
+            <a
+              href="https://conmitto.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="landing-footer-link"
+              style={{ fontWeight: 600 }}
+            >
+              Conmitto Inc
+            </a>
+            <span>·</span>
+            <span>Built for autonomous vending</span>
+          </div>
+        </footer>
+
+      </div>
     </div>
   );
 }
@@ -418,25 +485,3 @@ const howItWorks = [
   },
 ];
 
-const metrics = [
-  {
-    value: "500+",
-    label: "Kiosks Deployed",
-    gradient: "linear-gradient(135deg, #3b82f6, #06b6d4)",
-  },
-  {
-    value: "120K",
-    label: "Transactions Processed",
-    gradient: "linear-gradient(135deg, #10b981, #06b6d4)",
-  },
-  {
-    value: "99.9%",
-    label: "Uptime",
-    gradient: "linear-gradient(135deg, #8b5cf6, #ec4899)",
-  },
-  {
-    value: "< 2s",
-    label: "Avg. Checkout Time",
-    gradient: "linear-gradient(135deg, #f59e0b, #ef4444)",
-  },
-];
